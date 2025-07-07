@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>طلب زيادة متابعين مباشر</title>
+  <style>
+    body {
+      background: #121212;
+      color: #eee;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 10px;
+      min-height: 100vh;
+      margin: 0;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 25px;
+      font-weight: 700;
+    }
+    .form-group {
+      width: 300px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #bbb;
+    }
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 300px;
+      padding: 12px;
+      background-color: #1e88e5;
+      border: none;
+      border-radius: 6px;
+      font-size: 18px;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 10px;
+    }
+    button:disabled {
+      background-color: #555;
+      cursor: not-allowed;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 16px;
+      min-height: 24px;
+      color: #76ff03;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔥 طلب زيادة متابعين مباشر</h1>
+
+  <div class="form-group">
+    <label for="link">رابط الفيديو / الحساب</label>
+    <input type="text" id="link" placeholder="ضع الرابط هنا" />
+  </div>
+
+  <div class="form-group">
+    <label for="quantity">الكمية</label>
+    <input type="number" id="quantity" placeholder="مثلاً 100" min="1" />
+  </div>
+
+  <button id="sendBtn" onclick="submitOrder()">تأكيد الطلب</button>
+
+  <div id="result" role="alert" aria-live="polite"></div>
+
+  <script>
+    const API_KEY = 'YOUR_API_KEY_HERE'; // ضع مفتاح API الخاص بك هنا
+    const SERVICE_ID = 1; // رقم الخدمة الثابت
+
+    async function submitOrder() {
+      const sendBtn = document.getElementById('sendBtn');
+      const resultDiv = document.getElementById('result');
+
+      const link = document.getElementById('link').value.trim();
+      const quantity = document.getElementById('quantity').value;
+
+      if (!link) {
+        resultDiv.style.color = '#ff5252';
+        resultDiv.innerText = 'الرجاء إدخال رابط صالح.';
+        return;
+      }
+      if (!quantity || quantity <= 0) {
+        resultDiv.style.color = '#ff5252';
+        resultDiv.innerText = 'الرجاء إدخال كمية صحيحة.';
+        return;
+      }
+
+      sendBtn.disabled = true;
+      resultDiv.style.color = '#eee';
+      resultDiv.innerText = 'جاري إرسال الطلب...';
+
+      try {
+        const form = new FormData();
+        form.append('key', API_KEY);
+        form.append('action', 'add');
+        form.append('service', SERVICE_ID);
+        form.append('link', link);
+        form.append('quantity', quantity);
+
+        const res = await fetch('api.php', { method: 'POST', body: form });
+        const data = await res.json();
+
+        if (data.order) {
+          resultDiv.style.color = '#76ff03';
+          resultDiv.innerText = `تم إرسال الطلب مباشرة! رقم الطلب: ${data.order}`;
+        } else if (data.error) {
+          resultDiv.style.color = '#ff5252';
+          resultDiv.innerText = `خطأ: ${data.error}`;
+        } else {
+          resultDiv.style.color = '#ff5252';
+          resultDiv.innerText = 'حدث خطأ غير معروف.';
+        }
+      } catch (e) {
+        resultDiv.style.color = '#ff5252';
+        resultDiv.innerText = 'فشل الاتصال بالخادم.';
+      } finally {
+        sendBtn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
