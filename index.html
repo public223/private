@@ -485,16 +485,21 @@
                 <!-- Admin Tabs -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <!-- Products Management -->
-                    <div class="bg-white rounded-xl shadow-md p-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-xl font-bold flex items-center gap-2">
-                                <i class="fas fa-box text-xl"></i>
-                                إدارة المنتجات
-                            </h3>
-                            <button id="addProductBtn" class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:shadow-lg transition-all">
-                                <i class="fas fa-plus text-xl"></i>
-                                إضافة منتج
-                            </button>
+<div class="bg-white rounded-xl shadow-md p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-bold flex items-center gap-2">
+            <i class="fas fa-box text-xl"></i>
+            إدارة المنتجات
+        </h3>
+        <div class="flex gap-2">
+            <button id="testSaveBtn" class="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:shadow-lg transition-all">
+                <i class="fas fa-save text-xl"></i>
+                اختبار الحفظ
+            </button>
+            <button id="addProductBtn" class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:shadow-lg transition-all">
+                <i class="fas fa-plus text-xl"></i>
+                إضافة منتج
+            </button>
                         </div>
 
                         <div class="space-y-3 max-h-96 overflow-y-auto custom-scrollbar" id="adminProductsList">
@@ -1043,6 +1048,12 @@ let currentProductDetails = null;
             loadingScreen: document.getElementById('loadingScreen')
         };
 
+        // في قسم إعداد مستمعي الأحداث
+document.getElementById('testSaveBtn').addEventListener('click', async () => {
+    await saveData();
+    showNotification('تم اختبار حفظ البيانات بنجاح', 'success');
+});
+
         // تهيئة Firebase مع معالجة أفضل للأخطاء
 const firebaseConfig = {
   apiKey: "AIzaSyCsHb_ul0DsA2FjZWs-CIfsuRGVW6-C628",
@@ -1101,27 +1112,29 @@ const Database = {
                     }
                     
                     // إذا لم توجد بيانات محلية، جرب Firebase
-                    if (firebaseInitialized && db) {
-                        try {
-                            const doc = await db.collection('storeData').doc(key).get();
-                            if (doc.exists) {
-                                const firebaseData = doc.data().data;
-                                console.log(`تم جلب ${key} من Firebase`);
-                                // حفظ نسخة محلية للمرة القادمة
-                                localStorage.setItem(key, JSON.stringify(firebaseData));
-                                return firebaseData;
-                            }
-                        } catch (firebaseError) {
-                            console.warn(`فشل جلب ${key} من Firebase:`, firebaseError);
-                        }
-                    }
+        if (firebaseInitialized && db) {
+            try {
+                await Database.setItem('users', users);
+                await Database.setItem('categories', categories);
+                await Database.setItem('products', products);
+                await Database.setItem('offers', offers);
+                await Database.setItem('ratings', ratings);
+                await Database.setItem('favorites', favorites);
+                await Database.setItem('orders', orders);
+                console.log('تم حفظ البيانات في Firebase أيضاً');
+            } catch (firebaseError) {
+                console.log('فشل حفظ البيانات في Firebase:', firebaseError);
+            }
+        }
+
                     
-                    return null;
-                } catch (error) {
-                    console.error(`خطأ في جلب ${key}:`, error);
-                    return null;
-                }
-            },
+        return true;
+    } catch (error) {
+        console.error('خطأ في حفظ البيانات:', error);
+        showNotification('حدث خطأ في حفظ البيانات', 'error');
+        return false;
+    }
+},
             
             // الاستماع للتحديثات الفورية
     listenToChanges: function(callback) {
@@ -1269,75 +1282,90 @@ const Database = {
         }
 
         // تحميل البيانات من localStorage
-        async function loadFromLocalStorage() {
-            try {
-                users = JSON.parse(localStorage.getItem('users') || '[]');
-                categories = JSON.parse(localStorage.getItem('categories') || '[]');
-                products = JSON.parse(localStorage.getItem('products') || '[]');
-                offers = JSON.parse(localStorage.getItem('offers') || '[]');
-                ratings = JSON.parse(localStorage.getItem('ratings') || '[]');
-                favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-                orders = JSON.parse(localStorage.getItem('orders') || '[]');
-                cart = JSON.parse(localStorage.getItem('cart') || '[]');
+async function loadFromLocalStorage() {
+    try {
+        users = JSON.parse(localStorage.getItem('users') || '[]');
+        categories = JSON.parse(localStorage.getItem('categories') || '[]');
+        products = JSON.parse(localStorage.getItem('products') || '[]');
+        offers = JSON.parse(localStorage.getItem('offers') || '[]');
+        ratings = JSON.parse(localStorage.getItem('ratings') || '[]');
+        favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+        orders = JSON.parse(localStorage.getItem('orders') || '[]');
+        cart = JSON.parse(localStorage.getItem('cart') || '[]');
                 
-                const currentUserData = localStorage.getItem('currentUser');
-                currentUser = currentUserData ? JSON.parse(currentUserData) : null;
-                
-                console.log('تم تحميل البيانات من localStorage');
+        const currentUserData = localStorage.getItem('currentUser');
+        currentUser = currentUserData ? JSON.parse(currentUserData) : null;
+        
+        console.log('تم تحميل البيانات من localStorage');
             } catch (error) {
-                console.error('خطأ في تحميل البيانات من localStorage:', error);
-                // تهيئة بيانات افتراضية
-                await initializeDefaultData();
-            }
-        }
+        console.error('خطأ في تحميل البيانات من localStorage:', error);
+        // إعادة التعيين في حالة خطأ
+        users = [];
+        categories = [];
+        products = [];
+        offers = [];
+        ratings = [];
+        favorites = [];
+        orders = [];
+        cart = [];
+    }
+}
+
 
         // تحميل البيانات
-        async function loadData() {
-            try {
-                console.log('جاري تحميل البيانات...');
-                
-                // استخدام localStorage كخيار أساسي (أسرع وأكثر موثوقية)
-                await loadFromLocalStorage();
-                
-                // إذا لم تكن هناك بيانات، تهيئة البيانات الافتراضية
-                if (users.length === 0 && categories.length === 0 && products.length === 0) {
-                    console.log('لا توجد بيانات، جاري التهيئة...');
-                    await initializeDefaultData();
-                    // إعادة تحميل البيانات بعد التهيئة
-                    await loadFromLocalStorage();
-                }
-                
-                console.log('تم تحميل البيانات بنجاح:', {
-                    users: users.length,
-                    categories: categories.length,
-                    products: products.length
-                });
-                
-            } catch (error) {
-                console.error('خطأ في تحميل البيانات:', error);
-                // محاولة التحميل من localStorage كحل احتياطي
-                await loadFromLocalStorage();
-            }
+async function loadData() {
+    try {
+        console.log('جاري تحميل البيانات...');
+
+        // تحميل من localStorage أولاً (أسرع)
+        await loadFromLocalStorage();
+
+        // إذا لم تكن هناك بيانات، تهيئة البيانات الافتراضية
+        if (users.length === 0 && categories.length === 0 && products.length === 0) {
+            console.log('لا توجد بيانات، جاري التهيئة...');
+            await initializeDefaultData();
+            await loadFromLocalStorage();
         }
+
+        console.log('تم تحميل البيانات بنجاح:', {
+            users: users.length,
+            categories: categories.length,
+            products: products.length
+        });
+
+    } catch (error) {
+        console.error('خطأ في تحميل البيانات:', error);
+        await loadFromLocalStorage();
+    }
+}
+
 
         // حفظ البيانات
         async function saveData() {
-            try {
-                await Database.setItem('users', users);
-                await Database.setItem('categories', categories);
-                await Database.setItem('products', products);
-                await Database.setItem('offers', offers);
-                await Database.setItem('ratings', ratings);
-                await Database.setItem('favorites', favorites);
-                await Database.setItem('orders', orders);
-                await Database.setItem('cart', cart);
-                
+    try {
+        console.log('جاري حفظ البيانات...', {
+            users: users.length,
+            products: products.length,
+            categories: categories.length
+        });
+
+        // حفظ جميع البيانات في localStorage أولاً (لضمان السرعة)
+        localStorage.setItem('users', JSON.stringify(users));
+        localStorage.setItem('categories', JSON.stringify(categories));
+        localStorage.setItem('products', JSON.stringify(products));
+        localStorage.setItem('offers', JSON.stringify(offers));
+        localStorage.setItem('ratings', JSON.stringify(ratings));
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+        localStorage.setItem('orders', JSON.stringify(orders));
+        localStorage.setItem('cart', JSON.stringify(cart));
+
                 // حفظ المستخدم الحالي في localStorage فقط
-                if (currentUser) {
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                } else {
-                    localStorage.removeItem('currentUser');
-                }
+        if (currentUser) {
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        } else {
+            localStorage.removeItem('currentUser');
+        }
+
                 return true;
             } catch (error) {
                 console.error('خطأ في حفظ البيانات:', error);
@@ -1345,6 +1373,8 @@ const Database = {
                 return false;
             }
         }
+
+                console.log('تم حفظ البيانات في localStorage');
 
         // إعداد مستمعي الأحداث
         function setupEventListeners() {
@@ -1702,35 +1732,38 @@ const Database = {
         }
 
         // إضافة إلى السلة بكمية
-        async function addToCartWithQuantity(product, quantity = 1) {
-            if (!currentUser) {
-                showNotification('يجب تسجيل الدخول أولاً للشراء', 'error');
-                showAuthModal();
-                return;
-            }
+async function addToCartWithQuantity(product, quantity = 1) {
+    if (!currentUser) {
+        showNotification('يجب تسجيل الدخول أولاً للشراء', 'error');
+        showAuthModal();
+        return;
+    }
+
             
             // التحقق من توفر الكمية
-            if (product.quantity < quantity) {
-                showNotification(`الكمية المطلوبة غير متوفرة. المتاح: ${product.quantity}`, 'error');
-                return;
-            }
-            
-            const existingItem = cart.find(item => item.id === product.id);
-            if (existingItem) {
-                // التحقق من عدم تجاوز الكمية المتاحة
-                if (existingItem.quantity + quantity > product.quantity) {
-                    showNotification(`لا يمكن إضافة هذه الكمية. المتاح: ${product.quantity - existingItem.quantity}`, 'error');
-                    return;
-                }
-                existingItem.quantity += quantity;
-            } else {
-                cart.push({ ...product, quantity: quantity });
-            }
-            
-            await saveData();
-            showNotification('تم إضافة المنتج إلى السلة', 'success');
-            render();
+    if (product.quantity < quantity) {
+        showNotification(`الكمية المطلوبة غير متوفرة. المتاح: ${product.quantity}`, 'error');
+        return;
+    }
+    
+    const existingItem = cart.find(item => item.id === product.id);
+    if (existingItem) {
+        // التحقق من عدم تجاوز الكمية المتاحة
+        if (existingItem.quantity + quantity > product.quantity) {
+            showNotification(`لا يمكن إضافة هذه الكمية. المتاح: ${product.quantity - existingItem.quantity}`, 'error');
+            return;
         }
+        existingItem.quantity += quantity;
+    } else {
+        cart.push({ ...product, quantity: quantity });
+    }
+    
+    // حفظ البيانات فوراً
+    await saveData();
+    
+    showNotification('تم إضافة المنتج إلى السلة', 'success');
+    render();
+}
 
         // إضافة إلى السلة (كمية افتراضية 1)
         function addToCart(product) {
@@ -1998,42 +2031,45 @@ const Database = {
         }
 
         // معالجة تقديم نموذج المنتج
-        async function handleProductSubmit(e) {
-            e.preventDefault();
-            
-            const productData = {
-                name: elements.productName.value,
-                price: parseFloat(elements.productPrice.value),
-                image: elements.productImage.value,
-                category: elements.productCategory.value,
-                description: elements.productDescription.value,
-                quantity: parseInt(elements.productQuantity.value)
-            };
-            
-            if (editingProduct) {
-                // تحديث المنتج الحالي
-                const index = products.findIndex(p => p.id === editingProduct.id);
-                if (index !== -1) {
-                    products[index] = { ...productData, id: editingProduct.id };
-                    showNotification('تم تحديث المنتج بنجاح', 'success');
-                }
-            } else {
-                // إضافة منتج جديد
-                const newProduct = {
-                    ...productData,
-                    id: Date.now().toString()
-                };
-                products.push(newProduct);
-                showNotification('تم إضافة المنتج بنجاح', 'success');
-            }
-            
-            await saveData();
-            elements.adminProductModal.classList.add('hidden');
-            editingProduct = null;
-            // الذهاب للصفحة الرئيسية بعد إضافة المنتج
-            setCurrentPage('home');
-            render();
+        // معالجة تقديم نموذج المنتج
+async function handleProductSubmit(e) {
+    e.preventDefault();
+    
+    const productData = {
+        name: elements.productName.value,
+        price: parseFloat(elements.productPrice.value),
+        image: elements.productImage.value,
+        category: elements.productCategory.value,
+        description: elements.productDescription.value,
+        quantity: parseInt(elements.productQuantity.value)
+    };
+    
+    if (editingProduct) {
+        // تحديث المنتج الحالي
+        const index = products.findIndex(p => p.id === editingProduct.id);
+        if (index !== -1) {
+            products[index] = { ...productData, id: editingProduct.id };
+            showNotification('تم تحديث المنتج بنجاح', 'success');
         }
+    } else {
+        // إضافة منتج جديد
+        const newProduct = {
+            ...productData,
+            id: Date.now().toString()
+        };
+        products.push(newProduct);
+        showNotification('تم إضافة المنتج بنجاح', 'success');
+    }
+    
+    // حفظ البيانات فوراً
+    await saveData();
+    
+    elements.adminProductModal.classList.add('hidden');
+    editingProduct = null;
+    
+    // إعادة العرض
+    render();
+}
 
         // حذف المنتج
         async function deleteProduct(id) {
@@ -2158,31 +2194,37 @@ const Database = {
 
         // إضافة فئة
         async function addCategory(e) {
-            e.preventDefault();
-            
-            const name = elements.categoryName.value.trim();
-            if (name) {
-                const newCategory = {
-                    id: Date.now().toString(),
-                    name: name
-                };
-                categories.push(newCategory);
-                await saveData();
-                elements.categoryName.value = '';
-                showNotification('تم إضافة الفئة بنجاح', 'success');
-                render();
-            }
-        }
+    e.preventDefault();
+    
+    const name = elements.categoryName.value.trim();
+    if (name) {
+        const newCategory = {
+            id: Date.now().toString(),
+            name: name
+        };
+        categories.push(newCategory);
+        
+        // حفظ البيانات فوراً
+        await saveData();
+        
+        elements.categoryName.value = '';
+        showNotification('تم إضافة الفئة بنجاح', 'success');
+        render();
+    }
+}
 
         // حذف فئة
-        async function deleteCategory(id) {
-            if (confirm('هل تريد حذف هذه الفئة؟')) {
-                categories = categories.filter(c => c.id !== id);
-                await saveData();
-                showNotification('تم حذف الفئة بنجاح', 'success');
-                render();
-            }
-        }
+async function deleteProduct(id) {
+    if (confirm('هل تريد حذف هذا المنتج؟')) {
+        products = products.filter(p => p.id !== id);
+        
+        // حفظ البيانات فوراً
+        await saveData();
+        
+        showNotification('تم حذف المنتج بنجاح', 'success');
+        render();
+    }
+}
         
         // إظهار تفاصيل المنتج
         function showProductDetails(product) {
