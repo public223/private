@@ -1332,59 +1332,88 @@
         }
 
         // تحميل البيانات
-        async function loadData() {
+        // تحميل البيانات مع الأولوية لـ Firebase
+async function loadData() {
+    try {
+        console.log('جاري تحميل البيانات...');
+        
+        // محاولة تحميل البيانات من Firebase أولاً
+        let firebaseLoaded = false;
+        
+        if (firebaseInitialized) {
             try {
-                console.log('جاري تحميل البيانات...');
+                console.log('محاولة تحميل البيانات من Firebase...');
                 
-                // استخدام localStorage كخيار أساسي (أسرع وأكثر موثوقية)
-                await loadFromLocalStorage();
+                // تحميل جميع البيانات من Firebase
+                const [
+                    usersData, 
+                    categoriesData, 
+                    productsData, 
+                    offersData, 
+                    ratingsData, 
+                    favoritesData, 
+                    ordersData, 
+                    cartData
+                ] = await Promise.all([
+                    Database.getItem('users'),
+                    Database.getItem('categories'),
+                    Database.getItem('products'),
+                    Database.getItem('offers'),
+                    Database.getItem('ratings'),
+                    Database.getItem('favorites'),
+                    Database.getItem('orders'),
+                    Database.getItem('cart')
+                ]);
                 
-                // إذا لم تكن هناك بيانات، تهيئة البيانات الافتراضية
-                if (users.length === 0 && categories.length === 0 && products.length === 0) {
-                    console.log('لا توجد بيانات، جاري التهيئة...');
-                    await initializeDefaultData();
-                    // إعادة تحميل البيانات بعد التهيئة
-                    await loadFromLocalStorage();
+                // إذا تم تحميل البيانات من Firebase بنجاح
+                if (productsData && categoriesData) {
+                    users = usersData || [];
+                    categories = categoriesData || [];
+                    products = productsData || [];
+                    offers = offersData || [];
+                    ratings = ratingsData || [];
+                    favorites = favoritesData || [];
+                    orders = ordersData || [];
+                    cart = cartData || [];
+                    
+                    firebaseLoaded = true;
+                    console.log('تم تحميل البيانات من Firebase بنجاح');
                 }
-                
-                console.log('تم تحميل البيانات بنجاح:', {
-                    users: users.length,
-                    categories: categories.length,
-                    products: products.length
-                });
-                
-            } catch (error) {
-                console.error('خطأ في تحميل البيانات:', error);
-                // محاولة التحميل من localStorage كحل احتياطي
+            } catch (firebaseError) {
+                console.warn('فشل تحميل البيانات من Firebase:', firebaseError);
+            }
+        }
+        
+        // إذا لم تنجح تحميل البيانات من Firebase، جرب localStorage
+        if (!firebaseLoaded) {
+            console.log('جاري تحميل البيانات من localStorage...');
+            await loadFromLocalStorage();
+            
+            // إذا لم توجد بيانات في localStorage، قم بتهيئة البيانات الافتراضية
+            if (users.length === 0 && categories.length === 0 && products.length === 0) {
+                console.log('لا توجد بيانات، جاري التهيئة...');
+                await initializeDefaultData();
                 await loadFromLocalStorage();
             }
         }
-
-        // حفظ البيانات
-        async function saveData() {
-            try {
-                await Database.setItem('users', users);
-                await Database.setItem('categories', categories);
-                await Database.setItem('products', products);
-                await Database.setItem('offers', offers);
-                await Database.setItem('ratings', ratings);
-                await Database.setItem('favorites', favorites);
-                await Database.setItem('orders', orders);
-                await Database.setItem('cart', cart);
-                
-                // حفظ المستخدم الحالي في localStorage فقط
-                if (currentUser) {
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                } else {
-                    localStorage.removeItem('currentUser');
-                }
-                return true;
-            } catch (error) {
-                console.error('خطأ في حفظ البيانات:', error);
-                showNotification('حدث خطأ في حفظ البيانات', 'error');
-                return false;
-            }
-        }
+        
+        // تحميل المستخدم الحالي من localStorage فقط (لأنه خاص بكل مستخدم)
+        const currentUserData = localStorage.getItem('currentUser');
+        currentUser = currentUserData ? JSON.parse(currentUserData) : null;
+        
+        console.log('تم تحميل البيانات بنجاح:', {
+            users: users.length,
+            categories: categories.length,
+            products: products.length,
+            source: firebaseLoaded ? 'Firebase' : 'localStorage'
+        });
+        
+    } catch (error) {
+        console.error('خطأ في تحميل البيانات:', error);
+        // محاولة التحميل من localStorage كحل احتياطي
+        await loadFromLocalStorage();
+    }
+}
 
         // إعداد مستمعي الأحداث
         function setupEventListeners() {
@@ -3036,6 +3065,55 @@ function hideLoadingScreen() {
     const loadingScreen = document.getElementById('loadingScreen');
     if (loadingScreen) {
         loadingScreen.classList.add('hidden');
+    }
+}
+
+// حفظ البيانات مع الأولوية لـ Firebase
+async function saveData() {
+    try {
+        console.log('جاري حفظ البيانات...');
+        
+        // حفظ البيانات في Firebase أولاً (لضمان المزامنة بين جميع المستخدمين)
+        if (firebaseInitialized) {
+            try {
+                await Promise.all([
+                    Database.setItem('users', users),
+                    Database.setItem('categories', categories),
+                    Database.setItem('products', products),
+                    Database.setItem('offers', offers),
+                    Database.setItem('ratings', ratings),
+                    Database.setItem('favorites', favorites),
+                    Database.setItem('orders', orders)
+                ]);
+                console.log('تم حفظ البيانات في Firebase بنجاح');
+            } catch (firebaseError) {
+                console.warn('فشل حفظ البيانات في Firebase:', firebaseError);
+            }
+        }
+        
+        // حفظ البيانات في localStorage أيضاً (للنسخ الاحتياطي والأداء)
+        localStorage.setItem('users', JSON.stringify(users));
+        localStorage.setItem('categories', JSON.stringify(categories));
+        localStorage.setItem('products', JSON.stringify(products));
+        localStorage.setItem('offers', JSON.stringify(offers));
+        localStorage.setItem('ratings', JSON.stringify(ratings));
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+        localStorage.setItem('orders', JSON.stringify(orders));
+        localStorage.setItem('cart', JSON.stringify(cart));
+        
+        // حفظ المستخدم الحالي في localStorage فقط
+        if (currentUser) {
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        } else {
+            localStorage.removeItem('currentUser');
+        }
+        
+        console.log('تم حفظ البيانات بنجاح');
+        return true;
+    } catch (error) {
+        console.error('خطأ في حفظ البيانات:', error);
+        showNotification('حدث خطأ في حفظ البيانات', 'error');
+        return false;
     }
 }
         // بدء التطبيق
