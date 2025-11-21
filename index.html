@@ -872,25 +872,26 @@
 
     <script>
         // State management
-        let currentUser = null;
-        let users = [];
-        let products = [];
-        let categories = [];
-        let offers = [];
-        let cart = [];
-        let favorites = [];
-        let ratings = [];
-        let orders = [];
-        let currentPage = 'home';
-        let selectedCategory = 'all';
-        let selectedPriceFilter = 'all';
-        let searchQuery = '';
-        let sortOption = 'default';
-        let isLogin = true;
-        let editingProduct = null;
-        let editingOffer = null;
-        let selectedPaymentMethod = null;
-        let currentProductDetails = null;
+let currentUser = null;
+let users = [];
+let products = [];
+let categories = [];
+let offers = [];
+let cart = [];
+let favorites = [];
+let ratings = [];
+let orders = [];
+let currentPage = 'home';
+let selectedCategory = 'all';
+let selectedPriceFilter = 'all';
+let searchQuery = '';
+let sortOption = 'default';
+let isLogin = true;
+let editingProduct = null;
+let editingOffer = null;
+let selectedPaymentMethod = null;
+let currentProductDetails = null;
+
 
         // DOM Elements
         const elements = {
@@ -1043,63 +1044,51 @@
         };
 
         // تهيئة Firebase مع معالجة أفضل للأخطاء
-        const firebaseConfig = {
-          apiKey: "AIzaSyCsHb_ul0DsA2FjZWs-CIfsuRGVW6-C628",
-          authDomain: "falconstore-e985f.firebaseapp.com",
-          projectId: "falconstore-e985f",
-          storageBucket: "falconstore-e985f.firebasestorage.app",
-          messagingSenderId: "1043990877048",
-          appId: "1:1043990877048:web:74d861d58ded43dc822e8d",
-          measurementId: "G-4GQKL3NPK2"
-        };
+const firebaseConfig = {
+  apiKey: "AIzaSyCsHb_ul0DsA2FjZWs-CIfsuRGVW6-C628",
+  authDomain: "falconstore-e985f.firebaseapp.com",
+  projectId: "falconstore-e985f",
+  storageBucket: "falconstore-e985f.firebasestorage.app",
+  messagingSenderId: "1043990877048",
+  appId: "1:1043990877048:web:74d861d58ded43dc822e8d",
+  measurementId: "G-4GQKL3NPK2"
+};
+
 
         // Initialize Firebase مع معالجة الأخطاء
-        let db;
-        let firebaseInitialized = false;
+let db;
+let firebaseInitialized = false;
 
-        try {
-          if (typeof firebase !== 'undefined') {
+// تهيئة Firebase بشكل غير متزامن دون منع تحميل الصفحة
+setTimeout(() => {
+    try {
+        if (typeof firebase !== 'undefined') {
             if (firebase.apps.length === 0) {
-              firebase.initializeApp(firebaseConfig);
+                firebase.initializeApp(firebaseConfig);
             }
             db = firebase.firestore();
             firebaseInitialized = true;
             console.log('تم تهيئة Firebase بنجاح');
-          } else {
+        } else {
             console.log('Firebase غير متوفر، استخدام وضع عدم الاتصال');
-          }
-        } catch (error) {
-          console.error('خطأ في تهيئة Firebase:', error);
-          firebaseInitialized = false;
         }
+    } catch (error) {
+        console.error('خطأ في تهيئة Firebase:', error);
+        firebaseInitialized = false;
+    }
+}, 100);
 
         // نظام قاعدة البيانات الهجين مع الأولوية لـ localStorage
-        const Database = {
-            // حفظ البيانات في كلا المصدرين
-            setItem: async function(key, data) {
-                try {
-                    // حفظ في localStorage أولاً (لضمان السرعة والموثوقية)
-                    localStorage.setItem(key, JSON.stringify(data));
-                    
-                    // محاولة حفظ في Firebase إذا كان متاحاً
-                    if (firebaseInitialized && db) {
-                        try {
-                            await db.collection('storeData').doc(key).set({
-                                data: data,
-                                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                                lastModified: new Date().toISOString()
-                            });
-                            console.log(`تم حفظ ${key} في Firebase`);
-                        } catch (firebaseError) {
-                            console.warn(`فشل حفظ ${key} في Firebase:`, firebaseError);
-                        }
-                    }
-                    return true;
-                } catch (error) {
-                    console.error(`خطأ في حفظ ${key}:`, error);
-                    return false;
-                }
-            },
+const Database = {
+    setItem: async function(key, data) {
+        try {
+            localStorage.setItem(key, JSON.stringify(data));
+            return true;
+        } catch (error) {
+            console.error(`خطأ في حفظ ${key}:`, error);
+            return false;
+        }
+    },
             
             // جلب البيانات مع الأولوية لـ localStorage
             getItem: async function(key) {
@@ -1135,59 +1124,30 @@
             },
             
             // الاستماع للتحديثات الفورية
-            listenToChanges: function(callback) {
-                if (!firebaseInitialized || !db) {
-                    console.log('Firebase غير متوفر للاستماع للتحديثات');
-                    return;
-                }
+    listenToChanges: function(callback) {
+        console.log('وضع عدم الاتصال - لا توجد تحديثات فورية');
+    },
                 
-                db.collection('storeData').onSnapshot((snapshot) => {
-                    snapshot.docChanges().forEach((change) => {
-                        if (change.type === "modified" || change.type === "added") {
-                            console.log(`تم تحديث ${change.doc.id} في Firebase`);
-                            // تحديث localStorage أيضاً
-                            localStorage.setItem(change.doc.id, JSON.stringify(change.doc.data().data));
-                            callback(change.doc.id, change.doc.data().data);
-                        }
-                    });
-                }, (error) => {
-                    console.error('خطأ في الاستماع للتحديثات:', error);
-                });
-            },
-            
-            // حذف البيانات
-            removeItem: async function(key) {
-                try {
-                    localStorage.removeItem(key);
-                    if (firebaseInitialized && db) {
-                        await db.collection('storeData').doc(key).delete();
-                    }
-                    return true;
-                } catch (error) {
-                    console.error(`خطأ في حذف ${key}:`, error);
-                    return false;
-                }
-            },
-            
-            // مسح جميع البيانات
-            clear: async function() {
-                try {
-                    localStorage.clear();
-                    if (firebaseInitialized && db) {
-                        const snapshot = await db.collection('storeData').get();
-                        const batch = db.batch();
-                        snapshot.docs.forEach((doc) => {
-                            batch.delete(doc.ref);
-                        });
-                        await batch.commit();
-                    }
-                    return true;
-                } catch (error) {
-                    console.error('خطأ في مسح البيانات:', error);
-                    return false;
-                }
-            }
-        };
+    removeItem: async function(key) {
+        try {
+            localStorage.removeItem(key);
+            return true;
+        } catch (error) {
+            console.error(`خطأ في حذف ${key}:`, error);
+            return false;
+        }
+    },
+    
+    clear: async function() {
+        try {
+            localStorage.clear();
+            return true;
+        } catch (error) {
+            console.error('خطأ في مسح البيانات:', error);
+            return false;
+        }
+    }
+};
 
         // إعادة تعيين النظام
         async function resetSystem() {
@@ -2978,35 +2938,34 @@
             }
         }
 
-        // تهيئة التطبيق
-        async function init() {
-            try {
-                console.log('بدء تهيئة التطبيق...');
-                
-                await loadData();
-                setupEventListeners();
-                
-                // محاولة إعداد التحديثات الفورية (لا تمنع التحميل)
-                setTimeout(() => {
-                    if (firebaseInitialized) {
-                        setupRealtimeUpdates();
-                    }
-                }, 1000);
-                
-                render();
-                
-                // إخفاء شاشة التحميل بعد وقت قصير
-                setTimeout(() => {
-                    elements.loadingScreen.classList.add('hidden');
-                    console.log('تم تحميل التطبيق بنجاح');
-                }, 1500);
-                
-            } catch (error) {
-                console.error('خطأ في تهيئة التطبيق:', error);
-                elements.loadingScreen.classList.add('hidden');
-                showNotification('تم تحميل التطبيق في وضع عدم الاتصال', 'info');
+// تهيئة التطبيق
+async function init() {
+    try {
+        console.log('بدء تهيئة التطبيق...');
+        
+        // تحميل البيانات فوراً من localStorage (بدون انتظار Firebase)
+        await loadData();
+        setupEventListeners();
+        render();
+        
+        // إخفاء شاشة التحميل فوراً بعد تحميل البيانات الأساسية
+        elements.loadingScreen.classList.add('hidden');
+        console.log('تم تحميل التطبيق بنجاح');
+        
+        // محاولة إعداد التحديثات الفورية في الخلفية (لا تمنع التحميل)
+        setTimeout(() => {
+            if (firebaseInitialized) {
+                setupRealtimeUpdates();
+                console.log('تم إعداد التحديثات الفورية');
             }
-        }
+        }, 2000);
+        
+    } catch (error) {
+        console.error('خطأ في تهيئة التطبيق:', error);
+        elements.loadingScreen.classList.add('hidden');
+        showNotification('تم تحميل التطبيق في وضع عدم الاتصال', 'info');
+    }
+}
 
         // بدء التطبيق
         init();
