@@ -2978,36 +2978,66 @@
             }
         }
 
-        // تهيئة التطبيق
-        async function init() {
-            try {
-                console.log('بدء تهيئة التطبيق...');
-                
-                await loadData();
-                setupEventListeners();
-                
-                // محاولة إعداد التحديثات الفورية (لا تمنع التحميل)
-                setTimeout(() => {
-                    if (firebaseInitialized) {
-                        setupRealtimeUpdates();
-                    }
-                }, 1000);
-                
-                render();
-                
-                // إخفاء شاشة التحميل بعد وقت قصير
-                setTimeout(() => {
-                    elements.loadingScreen.classList.add('hidden');
-                    console.log('تم تحميل التطبيق بنجاح');
-                }, 1500);
-                
-            } catch (error) {
-                console.error('خطأ في تهيئة التطبيق:', error);
-                elements.loadingScreen.classList.add('hidden');
-                showNotification('تم تحميل التطبيق في وضع عدم الاتصال', 'info');
-            }
-        }
+        // إضافة مستمع حدث لتحميل الصفحة بالكامل
+document.addEventListener('DOMContentLoaded', function() {
+    // تأكد من إخفاء شاشة التحميل إذا استغرقت أكثر من 8 ثواني
+    setTimeout(() => {
+        hideLoadingScreen();
+    }, 8000);
+});
 
+// إضافة زر طوارئ في حالة استمرار المشكلة (أضفه في الـ footer)
+// يمكنك إضافة هذا الزر في قسم الفوتر:
+// <button id="emergencyHideLoading" class="mt-2 px-3 py-1 bg-orange-500 text-white rounded text-sm">إخفاء شاشة التحميل</button>
+
+// ثم أضف هذا المستمع في دالة setupEventListeners():
+document.getElementById('emergencyHideLoading')?.addEventListener('click', hideLoadingScreen);
+
+        // تهيئة التطبيق
+// تهيئة التطبيق
+async function init() {
+    try {
+        console.log('بدء تهيئة التطبيق...');
+        
+        // إعداد مهلة زمنية قصوى لإخفاء شاشة التحميل (5 ثواني كحد أقصى)
+        const loadingTimeout = setTimeout(() => {
+            console.warn('انتهت مهلة التحميل، إخفاء شاشة التحميل بشكل إجباري');
+            hideLoadingScreen();
+        }, 5000);
+        
+        await loadData();
+        setupEventListeners();
+        
+        // محاولة إعداد التحديثات الفورية (لا تمنع التحميل)
+        setTimeout(() => {
+            if (firebaseInitialized) {
+                setupRealtimeUpdates();
+            }
+        }, 1000);
+        
+        render();
+        
+        // إخفاء شاشة التحميل بعد وقت قصير
+        setTimeout(() => {
+            clearTimeout(loadingTimeout); // إلغاء المهلة
+            hideLoadingScreen();
+            console.log('تم تحميل التطبيق بنجاح');
+        }, 1000);
+        
+    } catch (error) {
+        console.error('خطأ في تهيئة التطبيق:', error);
+        hideLoadingScreen();
+        showNotification('تم تحميل التطبيق في وضع عدم الاتصال', 'info');
+    }
+}
+
+// دالة مساعدة لإخفاء شاشة التحميل
+function hideLoadingScreen() {
+    const loadingScreen = document.getElementById('loadingScreen');
+    if (loadingScreen) {
+        loadingScreen.classList.add('hidden');
+    }
+}
         // بدء التطبيق
         init();
     </script>
