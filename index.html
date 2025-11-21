@@ -1596,168 +1596,144 @@ function updateAuthModal() {
         }
 
         // معالجة المصادقة
-function handleAuth(e) {
-    e.preventDefault();
-    
-    const username = elements.usernameInput.value.trim();
-    const password = elements.passwordInput.value;
-    const email = elements.emailInput.value.trim();
-    
-    // مسح الأخطاء السابقة
-    clearAuthErrors();
-    
-    if (isLogin) {
-        // منطق تسجيل الدخول
-        const user = users.find(u => u.username === username && u.password === password);
-        
-        if (user) {
-            currentUser = user;
-            saveData();
-            elements.authModal.classList.add('hidden');
-            showNotification('تم تسجيل الدخول بنجاح', 'success');
+        function handleAuth(e) {
+            e.preventDefault();
             
-            // تحديث الواجهة مباشرة
-            render();
-        } else {
-            showAuthError('username', 'اسم المستخدم أو كلمة المرور غير صحيحة');
-            showAuthError('password', 'اسم المستخدم أو كلمة المرور غير صحيحة');
+            const username = elements.usernameInput.value.trim();
+            const password = elements.passwordInput.value;
+            const email = elements.emailInput.value.trim();
+            
+            // مسح الأخطاء السابقة
+            clearAuthErrors();
+            
+            if (isLogin) {
+                // منطق تسجيل الدخول
+                const user = users.find(u => u.username === username && u.password === password);
+                
+                if (user) {
+                    currentUser = user;
+                    saveData();
+                    elements.authModal.classList.add('hidden');
+                    showNotification('تم تسجيل الدخول بنجاح', 'success');
+                    render();
+                } else {
+                    showAuthError('username', 'اسم المستخدم أو كلمة المرور غير صحيحة');
+                    showAuthError('password', 'اسم المستخدم أو كلمة المرور غير صحيحة');
+                }
+            } else {
+                // منطق التسجيل
+                let hasError = false;
+                
+                if (users.some(u => u.username === username)) {
+                    showAuthError('username', 'اسم المستخدم موجود مسبقاً');
+                    hasError = true;
+                }
+                
+                if (users.some(u => u.email === email)) {
+                    showAuthError('email', 'البريد الإلكتروني موجود مسبقاً');
+                    hasError = true;
+                }
+                
+                if (password.length < 6) {
+                    showAuthError('password', 'كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+                    hasError = true;
+                }
+                
+                if (hasError) return;
+                
+                const newUser = {
+                    id: Date.now().toString(),
+                    username: username,
+                    password: password,
+                    email: email,
+                    role: 'user'
+                };
+                
+                users.push(newUser);
+                saveData();
+                currentUser = newUser;
+                saveData();
+                elements.authModal.classList.add('hidden');
+                showNotification('تم إنشاء الحساب بنجاح', 'success');
+                render();
+            }
         }
-    } else {
-        // منطق التسجيل
-        let hasError = false;
-        
-        if (users.some(u => u.username === username)) {
-            showAuthError('username', 'اسم المستخدم موجود مسبقاً');
-            hasError = true;
-        }
-        
-        if (users.some(u => u.email === email)) {
-            showAuthError('email', 'البريد الإلكتروني موجود مسبقاً');
-            hasError = true;
-        }
-        
-        if (password.length < 6) {
-            showAuthError('password', 'كلمة المرور يجب أن تكون 6 أحرف على الأقل');
-            hasError = true;
-        }
-        
-        if (hasError) return;
-        
-        const newUser = {
-            id: Date.now().toString(),
-            username: username,
-            password: password,
-            email: email,
-            role: 'user'
-        };
-        
-        users.push(newUser);
-        saveData();
-        currentUser = newUser;
-        saveData();
-        elements.authModal.classList.add('hidden');
-        showNotification('تم إنشاء الحساب بنجاح', 'success');
-        
-        // تحديث الواجهة مباشرة
-        render();
-    }
-}
-
 
         // معالجة تسجيل الخروج
-function handleLogout() {
-    currentUser = null;
-    saveData();
-    cart = [];
-    saveData();
-    setCurrentPage('home');
-    showNotification('تم تسجيل الخروج بنجاح', 'info');
-    
-    // تحديث الواجهة مباشرة
-    render();
-}
-
+        function handleLogout() {
+            currentUser = null;
+            saveData();
+            cart = [];
+            saveData();
+            setCurrentPage('home');
+            showNotification('تم تسجيل الخروج بنجاح', 'info');
+            render();
+        }
 
         // إضافة إلى السلة بكمية
-function addToCartWithQuantity(product, quantity = 1) {
-    if (!currentUser) {
-        showNotification('يجب تسجيل الدخول أولاً للشراء', 'error');
-        showAuthModal();
-        return;
-    }
-    
-    // التحقق من توفر الكمية
-    if (product.quantity < quantity) {
-        showNotification(`الكمية المطلوبة غير متوفرة. المتاح: ${product.quantity}`, 'error');
-        return;
-    }
-    
-    const existingItem = cart.find(item => item.id === product.id);
-    if (existingItem) {
-        // التحقق من عدم تجاوز الكمية المتاحة
-        if (existingItem.quantity + quantity > product.quantity) {
-            showNotification(`لا يمكن إضافة هذه الكمية. المتاح: ${product.quantity - existingItem.quantity}`, 'error');
-            return;
+        function addToCartWithQuantity(product, quantity = 1) {
+            if (!currentUser) {
+                showNotification('يجب تسجيل الدخول أولاً للشراء', 'error');
+                showAuthModal();
+                return;
+            }
+            
+            // التحقق من توفر الكمية
+            if (product.quantity < quantity) {
+                showNotification(`الكمية المطلوبة غير متوفرة. المتاح: ${product.quantity}`, 'error');
+                return;
+            }
+            
+            const existingItem = cart.find(item => item.id === product.id);
+            if (existingItem) {
+                // التحقق من عدم تجاوز الكمية المتاحة
+                if (existingItem.quantity + quantity > product.quantity) {
+                    showNotification(`لا يمكن إضافة هذه الكمية. المتاح: ${product.quantity - existingItem.quantity}`, 'error');
+                    return;
+                }
+                existingItem.quantity += quantity;
+            } else {
+                cart.push({ ...product, quantity: quantity });
+            }
+            
+            saveData();
+            showNotification('تم إضافة المنتج إلى السلة', 'success');
+            render();
         }
-        existingItem.quantity += quantity;
-    } else {
-        cart.push({ ...product, quantity: quantity });
-    }
-    
-    saveData();
-    showNotification('تم إضافة المنتج إلى السلة', 'success');
-    
-    // تحديث الواجهة مباشرة
-    updateCartCount();
-    if (currentPage === 'cart') {
-        renderCartPage();
-    }
-}
+
         // إضافة إلى السلة (كمية افتراضية 1)
         function addToCart(product) {
             addToCartWithQuantity(product, 1);
         }
 
         // إزالة من السلة
-function removeFromCart(productId) {
-    cart = cart.filter(item => item.id !== productId);
-    saveData();
-    showNotification('تم إزالة المنتج من السلة', 'info');
-    
-    // تحديث الواجهة مباشرة
-    updateCartCount();
-    if (currentPage === 'cart') {
-        renderCartPage();
-    } else {
-        render(); // تحديث كامل إذا لم تكن في صفحة السلة
-    }
-}
-
-// في دالة updateCartQuantity، تحديث الواجهة مباشرة
-function updateCartQuantity(productId, quantity) {
-    if (quantity === 0) {
-        removeFromCart(productId);
-    } else {
-        const item = cart.find(item => item.id === productId);
-        if (item) {
-            // التحقق من توفر كمية المنتج
-            const product = products.find(p => p.id === productId);
-            if (product && quantity > product.quantity) {
-                showNotification(`الكمية المطلوبة غير متوفرة. المتاح: ${product.quantity}`, 'error');
-                return;
-            }
-            
-            item.quantity = quantity;
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
             saveData();
-            
-            // تحديث الواجهة مباشرة
-            updateCartCount();
-            if (currentPage === 'cart') {
-                renderCartPage();
+            showNotification('تم إزالة المنتج من السلة', 'info');
+            render();
+        }
+
+        // تحديث كمية السلة
+        function updateCartQuantity(productId, quantity) {
+            if (quantity === 0) {
+                removeFromCart(productId);
+            } else {
+                const item = cart.find(item => item.id === productId);
+                if (item) {
+                    // التحقق من توفر كمية المنتج
+                    const product = products.find(p => p.id === productId);
+                    if (product && quantity > product.quantity) {
+                        showNotification(`الكمية المطلوبة غير متوفرة. المتاح: ${product.quantity}`, 'error');
+                        return;
+                    }
+                    
+                    item.quantity = quantity;
+                    saveData();
+                    render();
+                }
             }
         }
-    }
-}
         
         // حساب المجموع الكلي للسلة
         function calculateCartTotal() {
@@ -1862,35 +1838,30 @@ function updateCartQuantity(productId, quantity) {
         }
 
         // تبديل المفضلة
-function toggleFavorite(productId) {
-    if (!currentUser) {
-        showNotification('يجب تسجيل الدخول أولاً', 'error');
-        showAuthModal();
-        return;
-    }
-    
-    const index = favorites.findIndex(fav => fav.productId === productId && fav.userId === currentUser.id);
-    
-    if (index !== -1) {
-        favorites.splice(index, 1);
-        showNotification('تم إزالة المنتج من المفضلة', 'info');
-    } else {
-        favorites.push({
-            id: Date.now().toString(),
-            productId: productId,
-            userId: currentUser.id
-        });
-        showNotification('تم إضافة المنتج إلى المفضلة', 'success');
-    }
-    
-    saveData();
-    
-    // تحديث الواجهة مباشرة
-    if (currentPage === 'favorites') {
-        renderFavoritesPage();
-    }
-    updateFavoriteButton();
-}
+        function toggleFavorite(productId) {
+            if (!currentUser) {
+                showNotification('يجب تسجيل الدخول أولاً', 'error');
+                showAuthModal();
+                return;
+            }
+            
+            const index = favorites.findIndex(fav => fav.productId === productId && fav.userId === currentUser.id);
+            
+            if (index !== -1) {
+                favorites.splice(index, 1);
+                showNotification('تم إزالة المنتج من المفضلة', 'info');
+            } else {
+                favorites.push({
+                    id: Date.now().toString(),
+                    productId: productId,
+                    userId: currentUser.id
+                });
+                showNotification('تم إضافة المنتج إلى المفضلة', 'success');
+            }
+            
+            saveData();
+            render();
+        }
         
         // التحقق إذا كان المنتج مفضلاً
         function isFavorite(productId) {
@@ -1909,35 +1880,30 @@ function toggleFavorite(productId) {
         }
         
         // تقييم المنتج
-function rateProduct(productId, rating) {
-    if (!currentUser) {
-        showNotification('يجب تسجيل الدخول أولاً', 'error');
-        showAuthModal();
-        return;
-    }
-    
-    const existingRating = ratings.find(r => r.productId === productId && r.userId === currentUser.id);
-    
-    if (existingRating) {
-        existingRating.rating = rating;
-    } else {
-        ratings.push({
-            id: Date.now().toString(),
-            productId: productId,
-            userId: currentUser.id,
-            rating: rating
-        });
-    }
-    
-    saveData();
-    
-    // تحديث الواجهة مباشرة
-    if (currentPage === 'home') {
-        renderProducts();
-    }
-    showNotification('تم تقييم المنتج بنجاح', 'success');
-}
-
+        function rateProduct(productId, rating) {
+            if (!currentUser) {
+                showNotification('يجب تسجيل الدخول أولاً', 'error');
+                showAuthModal();
+                return;
+            }
+            
+            const existingRating = ratings.find(r => r.productId === productId && r.userId === currentUser.id);
+            
+            if (existingRating) {
+                existingRating.rating = rating;
+            } else {
+                ratings.push({
+                    id: Date.now().toString(),
+                    productId: productId,
+                    userId: currentUser.id,
+                    rating: rating
+                });
+            }
+            
+            saveData();
+            render();
+            showNotification('تم تقييم المنتج بنجاح', 'success');
+        }
         
         // الحصول على تقييم المنتج
         function getProductRating(productId) {
@@ -2002,42 +1968,41 @@ function rateProduct(productId, rating) {
 
         // معالجة تقديم نموذج المنتج
         function handleProductSubmit(e) {
-    e.preventDefault();
-    
-    const productData = {
-        name: elements.productName.value,
-        price: parseFloat(elements.productPrice.value),
-        image: elements.productImage.value,
-        category: elements.productCategory.value,
-        description: elements.productDescription.value,
-        quantity: parseInt(elements.productQuantity.value)
-    };
-    
-    if (editingProduct) {
-        // تحديث المنتج الحالي
-        const index = products.findIndex(p => p.id === editingProduct.id);
-        if (index !== -1) {
-            products[index] = { ...productData, id: editingProduct.id };
-            showNotification('تم تحديث المنتج بنجاح', 'success');
+            e.preventDefault();
+            
+            const productData = {
+                name: elements.productName.value,
+                price: parseFloat(elements.productPrice.value),
+                image: elements.productImage.value,
+                category: elements.productCategory.value,
+                description: elements.productDescription.value,
+                quantity: parseInt(elements.productQuantity.value)
+            };
+            
+            if (editingProduct) {
+                // تحديث المنتج الحالي
+                const index = products.findIndex(p => p.id === editingProduct.id);
+                if (index !== -1) {
+                    products[index] = { ...productData, id: editingProduct.id };
+                    showNotification('تم تحديث المنتج بنجاح', 'success');
+                }
+            } else {
+                // إضافة منتج جديد
+                const newProduct = {
+                    ...productData,
+                    id: Date.now().toString()
+                };
+                products.push(newProduct);
+                showNotification('تم إضافة المنتج بنجاح', 'success');
+            }
+            
+            saveData();
+            elements.adminProductModal.classList.add('hidden');
+            editingProduct = null;
+            // الذهاب للصفحة الرئيسية بعد إضافة المنتج
+            setCurrentPage('home');
+            render();
         }
-    } else {
-        // إضافة منتج جديد
-        const newProduct = {
-            ...productData,
-            id: Date.now().toString()
-        };
-        products.push(newProduct);
-        showNotification('تم إضافة المنتج بنجاح', 'success');
-    }
-    
-    saveData();
-    elements.adminProductModal.classList.add('hidden');
-    editingProduct = null;
-    
-    // تحديث الواجهة مباشرة
-    render();
-}
-
 
         // حذف المنتج
         function deleteProduct(id) {
@@ -2096,58 +2061,54 @@ function rateProduct(productId, rating) {
         }
         
         // معالجة تقديم نموذج العرض
-function handleOfferSubmit(e) {
-    e.preventDefault();
-    
-    const offerData = {
-        productId: elements.offerProduct.value,
-        discount: parseInt(elements.offerDiscount.value),
-        startDate: elements.offerStartDate.value,
-        endDate: elements.offerEndDate.value
-    };
-    
-    // التحقق من التواريخ
-    if (new Date(offerData.endDate) <= new Date(offerData.startDate)) {
-        showNotification('تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء', 'error');
-        return;
-    }
-    
-    if (editingOffer) {
-        // تحديث العرض الحالي
-        const index = offers.findIndex(o => o.id === editingOffer.id);
-        if (index !== -1) {
-            offers[index] = { ...offerData, id: editingOffer.id };
-            showNotification('تم تحديث العرض بنجاح', 'success');
+        function handleOfferSubmit(e) {
+            e.preventDefault();
+            
+            const offerData = {
+                productId: elements.offerProduct.value,
+                discount: parseInt(elements.offerDiscount.value),
+                startDate: elements.offerStartDate.value,
+                endDate: elements.offerEndDate.value
+            };
+            
+            // التحقق من التواريخ
+            if (new Date(offerData.endDate) <= new Date(offerData.startDate)) {
+                showNotification('تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء', 'error');
+                return;
+            }
+            
+            if (editingOffer) {
+                // تحديث العرض الحالي
+                const index = offers.findIndex(o => o.id === editingOffer.id);
+                if (index !== -1) {
+                    offers[index] = { ...offerData, id: editingOffer.id };
+                    showNotification('تم تحديث العرض بنجاح', 'success');
+                }
+            } else {
+                // إضافة عرض جديد
+                const newOffer = {
+                    ...offerData,
+                    id: Date.now().toString()
+                };
+                offers.push(newOffer);
+                showNotification('تم إضافة العرض بنجاح', 'success');
+            }
+            
+            saveData();
+            elements.adminOfferModal.classList.add('hidden');
+            editingOffer = null;
+            render();
         }
-    } else {
-        // إضافة عرض جديد
-        const newOffer = {
-            ...offerData,
-            id: Date.now().toString()
-        };
-        offers.push(newOffer);
-        showNotification('تم إضافة العرض بنجاح', 'success');
-    }
-    
-    saveData();
-    elements.adminOfferModal.classList.add('hidden');
-    editingOffer = null;
-    
-    // تحديث الواجهة مباشرة
-    render();
-}
-
+        
         // حذف العرض
         function deleteOffer(id) {
-    if (confirm('هل تريد حذف هذا العرض؟')) {
-        offers = offers.filter(o => o.id !== id);
-        saveData();
-        showNotification('تم حذف العرض بنجاح', 'success');
-        
-        // تحديث الواجهة مباشرة
-        render();
-    }
-}
+            if (confirm('هل تريد حذف هذا العرض؟')) {
+                offers = offers.filter(o => o.id !== id);
+                saveData();
+                showNotification('تم حذف العرض بنجاح', 'success');
+                render();
+            }
+        }
         
         // التحقق إذا كان للمنتج عرض نشط
         function getProductOffer(productId) {
@@ -2165,37 +2126,32 @@ function handleOfferSubmit(e) {
         }
 
         // إضافة فئة
-function addCategory(e) {
-    e.preventDefault();
-    
-    const name = elements.categoryName.value.trim();
-    if (name) {
-        const newCategory = {
-            id: Date.now().toString(),
-            name: name
-        };
-        categories.push(newCategory);
-        saveData();
-        elements.categoryName.value = '';
-        showNotification('تم إضافة الفئة بنجاح', 'success');
-        
-        // تحديث الواجهة مباشرة
-        render();
-    }
-}
+        function addCategory(e) {
+            e.preventDefault();
+            
+            const name = elements.categoryName.value.trim();
+            if (name) {
+                const newCategory = {
+                    id: Date.now().toString(),
+                    name: name
+                };
+                categories.push(newCategory);
+                saveData();
+                elements.categoryName.value = '';
+                showNotification('تم إضافة الفئة بنجاح', 'success');
+                render();
+            }
+        }
 
-// في دالة deleteProduct، تحديث الواجهة مباشرة
-function deleteProduct(id) {
-    if (confirm('هل تريد حذف هذا المنتج؟')) {
-        products = products.filter(p => p.id !== id);
-        saveData();
-        showNotification('تم حذف المنتج بنجاح', 'success');
-        
-        // تحديث الواجهة مباشرة
-        render();
-    }
-}
-
+        // حذف فئة
+        function deleteCategory(id) {
+            if (confirm('هل تريد حذف هذه الفئة؟')) {
+                categories = categories.filter(c => c.id !== id);
+                saveData();
+                showNotification('تم حذف الفئة بنجاح', 'success');
+                render();
+            }
+        }
         
         // إظهار تفاصيل المنتج
         function showProductDetails(product) {
