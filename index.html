@@ -101,28 +101,6 @@
             font-weight: bold;
             z-index: 10;
         }
-
-        /* تأكد من أن شاشة التحميل في المقدمة */
-#loadingScreen {
-    z-index: 9999;
-    display: flex;
-}
-
-/* تحسين مظهر spinner */
-.loading-spinner {
-    border: 3px solid #f3f3f3;
-    border-radius: 50%;
-    border-top: 3px solid #3b82f6;
-    width: 50px;
-    height: 50px;
-    animation: spin 1s linear infinite;
-    margin: 0 auto;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
         
         /* Star rating */
         .star-rating {
@@ -249,8 +227,8 @@
             border: 3px solid #f3f3f3;
             border-radius: 50%;
             border-top: 3px solid #3b82f6;
-            width: 30px;
-            height: 30px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
             margin: 20px auto;
         }
@@ -1064,154 +1042,153 @@
             loadingScreen: document.getElementById('loadingScreen')
         };
 
-        // تهيئة Firebase
-        
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-// تهيئة Firebase مع معالجة أفضل للأخطاء
-const firebaseConfig = {
-  apiKey: "AIzaSyCsHb_ul0DsA2FjZWs-CIfsuRGVW6-C628",
-  authDomain: "falconstore-e985f.firebaseapp.com",
-  projectId: "falconstore-e985f",
-  storageBucket: "falconstore-e985f.firebasestorage.app",
-  messagingSenderId: "1043990877048",
-  appId: "1:1043990877048:web:74d861d58ded43dc822e8d",
-  measurementId: "G-4GQKL3NPK2"
-};
+        // تهيئة Firebase مع معالجة أفضل للأخطاء
+        const firebaseConfig = {
+          apiKey: "AIzaSyCsHb_ul0DsA2FjZWs-CIfsuRGVW6-C628",
+          authDomain: "falconstore-e985f.firebaseapp.com",
+          projectId: "falconstore-e985f",
+          storageBucket: "falconstore-e985f.firebasestorage.app",
+          messagingSenderId: "1043990877048",
+          appId: "1:1043990877048:web:74d861d58ded43dc822e8d",
+          measurementId: "G-4GQKL3NPK2"
+        };
 
-// Initialize Firebase مع معالجة الأخطاء
-let db;
-let firebaseInitialized = false;
+        // Initialize Firebase مع معالجة الأخطاء
+        let db;
+        let firebaseInitialized = false;
 
-try {
-  if (typeof firebase !== 'undefined') {
-    if (firebase.apps.length === 0) {
-      firebase.initializeApp(firebaseConfig);
-    }
-    db = firebase.firestore();
-    firebaseInitialized = true;
-    console.log('تم تهيئة Firebase بنجاح');
-  } else {
-    console.log('Firebase غير متوفر، استخدام وضع عدم الاتصال');
-  }
-} catch (error) {
-  console.error('خطأ في تهيئة Firebase:', error);
-  firebaseInitialized = false;
-}
-
-        // نظام قاعدة البيانات مع Firebase
-// نظام قاعدة البيانات الهجين مع الأولوية لـ localStorage
-const Database = {
-    // حفظ البيانات في كلا المصدرين
-    setItem: async function(key, data) {
         try {
-            // حفظ في localStorage أولاً (لضمان السرعة والموثوقية)
-            localStorage.setItem(key, JSON.stringify(data));
-            
-            // محاولة حفظ في Firebase إذا كان متاحاً
-            if (firebaseInitialized && db) {
-                try {
-                    await db.collection('storeData').doc(key).set({
-                        data: data,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                        lastModified: new Date().toISOString()
-                    });
-                    console.log(`تم حفظ ${key} في Firebase`);
-                } catch (firebaseError) {
-                    console.warn(`فشل حفظ ${key} في Firebase:`, firebaseError);
-                }
+          if (typeof firebase !== 'undefined') {
+            if (firebase.apps.length === 0) {
+              firebase.initializeApp(firebaseConfig);
             }
-            return true;
+            db = firebase.firestore();
+            firebaseInitialized = true;
+            console.log('تم تهيئة Firebase بنجاح');
+          } else {
+            console.log('Firebase غير متوفر، استخدام وضع عدم الاتصال');
+          }
         } catch (error) {
-            console.error(`خطأ في حفظ ${key}:`, error);
-            return false;
+          console.error('خطأ في تهيئة Firebase:', error);
+          firebaseInitialized = false;
         }
-    },
-    
-    // جلب البيانات مع الأولوية لـ localStorage
-    getItem: async function(key) {
-        try {
-            // الأولوية للبيانات المحلية (أسرع وأكثر موثوقية)
-            const localData = localStorage.getItem(key);
-            if (localData) {
-                console.log(`تم جلب ${key} من localStorage`);
-                return JSON.parse(localData);
-            }
-            
-            // إذا لم توجد بيانات محلية، جرب Firebase
-            if (firebaseInitialized && db) {
+
+        // نظام قاعدة البيانات الهجين مع الأولوية لـ localStorage
+        const Database = {
+            // حفظ البيانات في كلا المصدرين
+            setItem: async function(key, data) {
                 try {
-                    const doc = await db.collection('storeData').doc(key).get();
-                    if (doc.exists) {
-                        const firebaseData = doc.data().data;
-                        console.log(`تم جلب ${key} من Firebase`);
-                        // حفظ نسخة محلية للمرة القادمة
-                        localStorage.setItem(key, JSON.stringify(firebaseData));
-                        return firebaseData;
+                    // حفظ في localStorage أولاً (لضمان السرعة والموثوقية)
+                    localStorage.setItem(key, JSON.stringify(data));
+                    
+                    // محاولة حفظ في Firebase إذا كان متاحاً
+                    if (firebaseInitialized && db) {
+                        try {
+                            await db.collection('storeData').doc(key).set({
+                                data: data,
+                                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                                lastModified: new Date().toISOString()
+                            });
+                            console.log(`تم حفظ ${key} في Firebase`);
+                        } catch (firebaseError) {
+                            console.warn(`فشل حفظ ${key} في Firebase:`, firebaseError);
+                        }
                     }
-                } catch (firebaseError) {
-                    console.warn(`فشل جلب ${key} من Firebase:`, firebaseError);
+                    return true;
+                } catch (error) {
+                    console.error(`خطأ في حفظ ${key}:`, error);
+                    return false;
                 }
-            }
+            },
             
-            return null;
-        } catch (error) {
-            console.error(`خطأ في جلب ${key}:`, error);
-            return null;
-        }
-    },
-    
-    // باقي الدوال تبقى كما هي...
-    listenToChanges: function(callback) {
-        if (!firebaseInitialized || !db) {
-            console.log('Firebase غير متوفر للاستماع للتحديثات');
-            return;
-        }
-        
-        db.collection('storeData').onSnapshot((snapshot) => {
-            snapshot.docChanges().forEach((change) => {
-                if (change.type === "modified" || change.type === "added") {
-                    console.log(`تم تحديث ${change.doc.id} في Firebase`);
-                    // تحديث localStorage أيضاً
-                    localStorage.setItem(change.doc.id, JSON.stringify(change.doc.data().data));
-                    callback(change.doc.id, change.doc.data().data);
+            // جلب البيانات مع الأولوية لـ localStorage
+            getItem: async function(key) {
+                try {
+                    // الأولوية للبيانات المحلية (أسرع وأكثر موثوقية)
+                    const localData = localStorage.getItem(key);
+                    if (localData) {
+                        console.log(`تم جلب ${key} من localStorage`);
+                        return JSON.parse(localData);
+                    }
+                    
+                    // إذا لم توجد بيانات محلية، جرب Firebase
+                    if (firebaseInitialized && db) {
+                        try {
+                            const doc = await db.collection('storeData').doc(key).get();
+                            if (doc.exists) {
+                                const firebaseData = doc.data().data;
+                                console.log(`تم جلب ${key} من Firebase`);
+                                // حفظ نسخة محلية للمرة القادمة
+                                localStorage.setItem(key, JSON.stringify(firebaseData));
+                                return firebaseData;
+                            }
+                        } catch (firebaseError) {
+                            console.warn(`فشل جلب ${key} من Firebase:`, firebaseError);
+                        }
+                    }
+                    
+                    return null;
+                } catch (error) {
+                    console.error(`خطأ في جلب ${key}:`, error);
+                    return null;
                 }
-            });
-        }, (error) => {
-            console.error('خطأ في الاستماع للتحديثات:', error);
-        });
-    },
-    
-    removeItem: async function(key) {
-        try {
-            localStorage.removeItem(key);
-            if (firebaseInitialized && db) {
-                await db.collection('storeData').doc(key).delete();
-            }
-            return true;
-        } catch (error) {
-            console.error(`خطأ في حذف ${key}:`, error);
-            return false;
-        }
-    },
-    
-    clear: async function() {
-        try {
-            localStorage.clear();
-            if (firebaseInitialized && db) {
-                const snapshot = await db.collection('storeData').get();
-                const batch = db.batch();
-                snapshot.docs.forEach((doc) => {
-                    batch.delete(doc.ref);
+            },
+            
+            // الاستماع للتحديثات الفورية
+            listenToChanges: function(callback) {
+                if (!firebaseInitialized || !db) {
+                    console.log('Firebase غير متوفر للاستماع للتحديثات');
+                    return;
+                }
+                
+                db.collection('storeData').onSnapshot((snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === "modified" || change.type === "added") {
+                            console.log(`تم تحديث ${change.doc.id} في Firebase`);
+                            // تحديث localStorage أيضاً
+                            localStorage.setItem(change.doc.id, JSON.stringify(change.doc.data().data));
+                            callback(change.doc.id, change.doc.data().data);
+                        }
+                    });
+                }, (error) => {
+                    console.error('خطأ في الاستماع للتحديثات:', error);
                 });
-                await batch.commit();
+            },
+            
+            // حذف البيانات
+            removeItem: async function(key) {
+                try {
+                    localStorage.removeItem(key);
+                    if (firebaseInitialized && db) {
+                        await db.collection('storeData').doc(key).delete();
+                    }
+                    return true;
+                } catch (error) {
+                    console.error(`خطأ في حذف ${key}:`, error);
+                    return false;
+                }
+            },
+            
+            // مسح جميع البيانات
+            clear: async function() {
+                try {
+                    localStorage.clear();
+                    if (firebaseInitialized && db) {
+                        const snapshot = await db.collection('storeData').get();
+                        const batch = db.batch();
+                        snapshot.docs.forEach((doc) => {
+                            batch.delete(doc.ref);
+                        });
+                        await batch.commit();
+                    }
+                    return true;
+                } catch (error) {
+                    console.error('خطأ في مسح البيانات:', error);
+                    return false;
+                }
             }
-            return true;
-        } catch (error) {
-            console.error('خطأ في مسح البيانات:', error);
-            return false;
-        }
-    }
-};
+        };
+
         // إعادة تعيين النظام
         async function resetSystem() {
             if (confirm('هل تريد إعادة تعيين النظام؟ سيتم حذف جميع البيانات.')) {
@@ -1225,195 +1202,190 @@ const Database = {
         }
 
         // تهيئة البيانات الافتراضية
-        // تهيئة البيانات الافتراضية
-async function initializeDefaultData() {
-    console.log('جاري تهيئة البيانات الافتراضية...');
-    
-    // بيانات المستخدمين الافتراضية - تأكد من حفظها
-    const defaultUsers = [
-        {
-            id: '1',
-            username: 'admin',
-            password: 'admin123',
-            email: 'admin@store.com',
-            role: 'admin'
-        },
-        {
-            id: '2', 
-            username: 'user',
-            password: 'user123',
-            email: 'user@store.com',
-            role: 'user'
-        }
-    ];
-    
-    // بيانات الفئات الافتراضية
-    const defaultCategories = [
-        { id: '1', name: 'إلكترونيات' },
-        { id: '2', name: 'ملابس' },
-        { id: '3', name: 'أحذية' },
-        { id: '4', name: 'أجهزة منزلية' }
-    ];
-    
-    // بيانات المنتجات الافتراضية
-    const defaultProducts = [
-        {
-            id: '1',
-            name: 'هاتف ذكي',
-            price: 299,
-            image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400',
-            category: '1',
-            description: 'هاتف ذكي بمواصفات عالية وكاميرا متميزة، بشاشة كبيرة وذاكرة تخزين واسعة',
-            quantity: 50
-        },
-        {
-            id: '2',
-            name: 'قميص رجالي',
-            price: 49,
-            image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400',
-            category: '2',
-            description: 'قميص أنيق ومريح مصنوع من القطن عالي الجودة، مناسب للمناسبات الرسمية واليومية',
-            quantity: 100
-        },
-        {
-            id: '3',
-            name: 'حذاء رياضي',
-            price: 89,
-            image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400',
-            category: '3',
-            description: 'حذاء رياضي مريح وعصري، مناسب للرياضة والاستخدام اليومي',
-            quantity: 75
-        },
-        {
-            id: '4',
-            name: 'لابتوب',
-            price: 599,
-            image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400',
-            category: '1',
-            description: 'لابتوب قوي بمعالج حديث وشاشة عالية الدقة، مثالي للعمل والترفيه',
-            quantity: 25
-        }
-    ];
+        async function initializeDefaultData() {
+            console.log('جاري تهيئة البيانات الافتراضية...');
+            
+            // بيانات المستخدمين الافتراضية - تأكد من حفظها
+            const defaultUsers = [
+                {
+                    id: '1',
+                    username: 'admin',
+                    password: 'admin123',
+                    email: 'admin@store.com',
+                    role: 'admin'
+                },
+                {
+                    id: '2', 
+                    username: 'user',
+                    password: 'user123',
+                    email: 'user@store.com',
+                    role: 'user'
+                }
+            ];
+            
+            // بيانات الفئات الافتراضية
+            const defaultCategories = [
+                { id: '1', name: 'إلكترونيات' },
+                { id: '2', name: 'ملابس' },
+                { id: '3', name: 'أحذية' },
+                { id: '4', name: 'أجهزة منزلية' }
+            ];
+            
+            // بيانات المنتجات الافتراضية
+            const defaultProducts = [
+                {
+                    id: '1',
+                    name: 'هاتف ذكي',
+                    price: 299,
+                    image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400',
+                    category: '1',
+                    description: 'هاتف ذكي بمواصفات عالية وكاميرا متميزة، بشاشة كبيرة وذاكرة تخزين واسعة',
+                    quantity: 50
+                },
+                {
+                    id: '2',
+                    name: 'قميص رجالي',
+                    price: 49,
+                    image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400',
+                    category: '2',
+                    description: 'قميص أنيق ومريح مصنوع من القطن عالي الجودة، مناسب للمناسبات الرسمية واليومية',
+                    quantity: 100
+                },
+                {
+                    id: '3',
+                    name: 'حذاء رياضي',
+                    price: 89,
+                    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400',
+                    category: '3',
+                    description: 'حذاء رياضي مريح وعصري، مناسب للرياضة والاستخدام اليومي',
+                    quantity: 75
+                },
+                {
+                    id: '4',
+                    name: 'لابتوب',
+                    price: 599,
+                    image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400',
+                    category: '1',
+                    description: 'لابتوب قوي بمعالج حديث وشاشة عالية الدقة، مثالي للعمل والترفيه',
+                    quantity: 25
+                }
+            ];
 
-    try {
-        // حفظ البيانات في localStorage أولاً (كمصدر أساسي)
-        localStorage.setItem('users', JSON.stringify(defaultUsers));
-        localStorage.setItem('categories', JSON.stringify(defaultCategories));
-        localStorage.setItem('products', JSON.stringify(defaultProducts));
-        localStorage.setItem('offers', JSON.stringify([]));
-        localStorage.setItem('ratings', JSON.stringify([]));
-        localStorage.setItem('favorites', JSON.stringify([]));
-        localStorage.setItem('orders', JSON.stringify([]));
-        localStorage.setItem('cart', JSON.stringify([]));
-        
-        console.log('تم حفظ البيانات في localStorage');
-        
-        // محاولة حفظ في Firebase إذا كان متاحاً
-        if (firebaseInitialized) {
             try {
-                await Database.setItem('users', defaultUsers);
-                await Database.setItem('categories', defaultCategories);
-                await Database.setItem('products', defaultProducts);
-                await Database.setItem('offers', []);
-                await Database.setItem('ratings', []);
-                await Database.setItem('favorites', []);
-                await Database.setItem('orders', []);
-                await Database.setItem('cart', []);
-                console.log('تم حفظ البيانات في Firebase أيضاً');
-            } catch (firebaseError) {
-                console.log('تم حفظ البيانات في localStorage فقط، Firebase فشل:', firebaseError);
+                // حفظ البيانات في localStorage أولاً (كمصدر أساسي)
+                localStorage.setItem('users', JSON.stringify(defaultUsers));
+                localStorage.setItem('categories', JSON.stringify(defaultCategories));
+                localStorage.setItem('products', JSON.stringify(defaultProducts));
+                localStorage.setItem('offers', JSON.stringify([]));
+                localStorage.setItem('ratings', JSON.stringify([]));
+                localStorage.setItem('favorites', JSON.stringify([]));
+                localStorage.setItem('orders', JSON.stringify([]));
+                localStorage.setItem('cart', JSON.stringify([]));
+                
+                console.log('تم حفظ البيانات في localStorage');
+                
+                // محاولة حفظ في Firebase إذا كان متاحاً
+                if (firebaseInitialized) {
+                    try {
+                        await Database.setItem('users', defaultUsers);
+                        await Database.setItem('categories', defaultCategories);
+                        await Database.setItem('products', defaultProducts);
+                        await Database.setItem('offers', []);
+                        await Database.setItem('ratings', []);
+                        await Database.setItem('favorites', []);
+                        await Database.setItem('orders', []);
+                        await Database.setItem('cart', []);
+                        console.log('تم حفظ البيانات في Firebase أيضاً');
+                    } catch (firebaseError) {
+                        console.log('تم حفظ البيانات في localStorage فقط، Firebase فشل:', firebaseError);
+                    }
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('خطأ في حفظ البيانات الافتراضية:', error);
+                return false;
             }
         }
-        
-        return true;
-    } catch (error) {
-        console.error('خطأ في حفظ البيانات الافتراضية:', error);
-        return false;
-    }
-}
+
+        // تحميل البيانات من localStorage
+        async function loadFromLocalStorage() {
+            try {
+                users = JSON.parse(localStorage.getItem('users') || '[]');
+                categories = JSON.parse(localStorage.getItem('categories') || '[]');
+                products = JSON.parse(localStorage.getItem('products') || '[]');
+                offers = JSON.parse(localStorage.getItem('offers') || '[]');
+                ratings = JSON.parse(localStorage.getItem('ratings') || '[]');
+                favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+                orders = JSON.parse(localStorage.getItem('orders') || '[]');
+                cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                
+                const currentUserData = localStorage.getItem('currentUser');
+                currentUser = currentUserData ? JSON.parse(currentUserData) : null;
+                
+                console.log('تم تحميل البيانات من localStorage');
+            } catch (error) {
+                console.error('خطأ في تحميل البيانات من localStorage:', error);
+                // تهيئة بيانات افتراضية
+                await initializeDefaultData();
+            }
+        }
 
         // تحميل البيانات
-// تحميل البيانات
-async function loadData() {
-    try {
-        console.log('جاري تحميل البيانات...');
-        
-        // التحقق من اتصال Firebase أولاً
-        const isFirebaseConnected = await checkFirebaseConnection();
-        
-        if (!isFirebaseConnected) {
-            console.log('استخدام البيانات المحلية فقط');
-            await loadFromLocalStorage();
-        } else {
-            // محاولة جلب البيانات من Firebase مع مهلة زمنية
-            await loadFromFirebaseWithTimeout();
+        async function loadData() {
+            try {
+                console.log('جاري تحميل البيانات...');
+                
+                // استخدام localStorage كخيار أساسي (أسرع وأكثر موثوقية)
+                await loadFromLocalStorage();
+                
+                // إذا لم تكن هناك بيانات، تهيئة البيانات الافتراضية
+                if (users.length === 0 && categories.length === 0 && products.length === 0) {
+                    console.log('لا توجد بيانات، جاري التهيئة...');
+                    await initializeDefaultData();
+                    // إعادة تحميل البيانات بعد التهيئة
+                    await loadFromLocalStorage();
+                }
+                
+                console.log('تم تحميل البيانات بنجاح:', {
+                    users: users.length,
+                    categories: categories.length,
+                    products: products.length
+                });
+                
+            } catch (error) {
+                console.error('خطأ في تحميل البيانات:', error);
+                // محاولة التحميل من localStorage كحل احتياطي
+                await loadFromLocalStorage();
+            }
         }
-        
-        // إذا لم تكن هناك بيانات، تهيئة البيانات الافتراضية
-        if (users.length === 0 && categories.length === 0 && products.length === 0) {
-            console.log('لا توجد بيانات، جاري التهيئة...');
-            await initializeDefaultData();
+
+        // حفظ البيانات
+        async function saveData() {
+            try {
+                await Database.setItem('users', users);
+                await Database.setItem('categories', categories);
+                await Database.setItem('products', products);
+                await Database.setItem('offers', offers);
+                await Database.setItem('ratings', ratings);
+                await Database.setItem('favorites', favorites);
+                await Database.setItem('orders', orders);
+                await Database.setItem('cart', cart);
+                
+                // حفظ المستخدم الحالي في localStorage فقط
+                if (currentUser) {
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                } else {
+                    localStorage.removeItem('currentUser');
+                }
+                return true;
+            } catch (error) {
+                console.error('خطأ في حفظ البيانات:', error);
+                showNotification('حدث خطأ في حفظ البيانات', 'error');
+                return false;
+            }
         }
-        
-        console.log('تم تحميل البيانات بنجاح:', {
-            users: users.length,
-            categories: categories.length,
-            products: products.length
-        });
-        
-    } catch (error) {
-        console.error('خطأ في تحميل البيانات:', error);
-        // محاولة التحميل من localStorage كحل احتياطي
-        await loadFromLocalStorage();
-    }
-}
 
-// تحميل البيانات من localStorage
-async function loadFromLocalStorage() {
-    try {
-        users = JSON.parse(localStorage.getItem('users') || '[]');
-        categories = JSON.parse(localStorage.getItem('categories') || '[]');
-        products = JSON.parse(localStorage.getItem('products') || '[]');
-        offers = JSON.parse(localStorage.getItem('offers') || '[]');
-        ratings = JSON.parse(localStorage.getItem('ratings') || '[]');
-        favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-        orders = JSON.parse(localStorage.getItem('orders') || '[]');
-        cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        
-        const currentUserData = localStorage.getItem('currentUser');
-        currentUser = currentUserData ? JSON.parse(currentUserData) : null;
-        
-        console.log('تم تحميل البيانات من localStorage');
-    } catch (error) {
-        console.error('خطأ في تحميل البيانات من localStorage:', error);
-        // تهيئة بيانات افتراضية
-        await initializeDefaultData();
-    }
-}
-
-// تحميل البيانات من Firebase مع مهلة زمنية
-async function loadFromFirebaseWithTimeout() {
-    const timeout = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('انتهت مهلة الاتصال')), 10000)
-    );
-    
-    const loadData = Promise.all([
-        Database.getItem('users').then(data => users = data || []),
-        Database.getItem('categories').then(data => categories = data || []),
-        Database.getItem('products').then(data => products = data || []),
-        Database.getItem('offers').then(data => offers = data || []),
-        Database.getItem('ratings').then(data => ratings = data || []),
-        Database.getItem('favorites').then(data => favorites = data || []),
-        Database.getItem('orders').then(data => orders = data || []),
-        Database.getItem('cart').then(data => cart = data || [])
-    ]);
-    
-    await Promise.race([loadData, timeout]);
-    
-    // تحميل المستخدم الحالي
-    const currentUserData = localStorage.getItem('currentUser');
-    currentUser = currentUserData ? JSON.parse(currentUserData) : null;
-}
         // إعداد مستمعي الأحداث
         function setupEventListeners() {
             // التنقل
@@ -3007,57 +2979,34 @@ async function loadFromFirebaseWithTimeout() {
         }
 
         // تهيئة التطبيق
-// تهيئة التطبيق
-async function init() {
-    try {
-        console.log('بدء تهيئة التطبيق...');
-        
-        await loadData();
-        setupEventListeners();
-        
-        // محاولة إعداد التحديثات الفورية (لا تمنع التحميل)
-        setTimeout(() => {
-            if (firebaseInitialized) {
-                setupRealtimeUpdates();
+        async function init() {
+            try {
+                console.log('بدء تهيئة التطبيق...');
+                
+                await loadData();
+                setupEventListeners();
+                
+                // محاولة إعداد التحديثات الفورية (لا تمنع التحميل)
+                setTimeout(() => {
+                    if (firebaseInitialized) {
+                        setupRealtimeUpdates();
+                    }
+                }, 1000);
+                
+                render();
+                
+                // إخفاء شاشة التحميل بعد وقت قصير
+                setTimeout(() => {
+                    elements.loadingScreen.classList.add('hidden');
+                    console.log('تم تحميل التطبيق بنجاح');
+                }, 1500);
+                
+            } catch (error) {
+                console.error('خطأ في تهيئة التطبيق:', error);
+                elements.loadingScreen.classList.add('hidden');
+                showNotification('تم تحميل التطبيق في وضع عدم الاتصال', 'info');
             }
-        }, 1000);
-        
-        render();
-        
-        // إخفاء شاشة التحميل بعد وقت قصير
-        setTimeout(() => {
-            elements.loadingScreen.classList.add('hidden');
-            console.log('تم تحميل التطبيق بنجاح');
-        }, 1500);
-        
-    } catch (error) {
-        console.error('خطأ في تهيئة التطبيق:', error);
-        elements.loadingScreen.classList.add('hidden');
-        showNotification('تم تحميل التطبيق في وضع عدم الاتصال', 'info');
-    }
-}
-
-// التحقق من اتصال Firebase
-function checkFirebaseConnection() {
-    return new Promise((resolve) => {
-        if (!db) {
-            console.log('Firebase غير متوفر، استخدام وضع عدم الاتصال');
-            resolve(false);
-            return;
         }
-        
-        // محاولة الاتصال بقاعدة البيانات
-        db.collection('storeData').limit(1).get()
-            .then(() => {
-                console.log('الاتصال بـ Firebase ناجح');
-                resolve(true);
-            })
-            .catch((error) => {
-                console.log('الاتصال بـ Firebase فشل، استخدام وضع عدم الاتصال:', error);
-                resolve(false);
-            });
-    });
-}
 
         // بدء التطبيق
         init();
