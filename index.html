@@ -1043,28 +1043,30 @@
         };
 
         // تهيئة Firebase
-        
+
+// تهيئة Firebase - الإصدار المتوافق
 const firebaseConfig = {
   apiKey: "AIzaSyCsHb_ul0DsA2FjZWs-CIfsuRGVW6-C628",
   authDomain: "falconstore-e985f.firebaseapp.com",
   projectId: "falconstore-e985f",
   storageBucket: "falconstore-e985f.firebasestorage.app",
   messagingSenderId: "1043990877048",
-  appId: "1:1043990877048:web:74d861d58ded43dc822e8d",
-  measurementId: "G-4GQKL3NPK2"
+  appId: "1:1043990877048:web:74d861d58ded43dc822e8d"
 };
 
-        // Initialize Firebase
-        let db;
-        try {
-            if (firebase.apps.length === 0) {
-                firebase.initializeApp(firebaseConfig);
-            }
-            db = firebase.firestore();
-            console.log('تم تهيئة Firebase بنجاح');
-        } catch (error) {
-            console.error('خطأ في تهيئة Firebase:', error);
-        }
+// Initialize Firebase
+let db;
+try {
+    // استخدام الإصدار المتوافق (Compat)
+    if (firebase.apps.length === 0) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    db = firebase.firestore();
+    console.log('✅ تم تهيئة Firebase بنجاح');
+} catch (error) {
+    console.error('❌ خطأ في تهيئة Firebase:', error);
+    // الاستمرار حتى لو فشل Firebase
+}
 
         // نظام قاعدة البيانات مع Firebase
         const Database = {
@@ -1299,54 +1301,51 @@ const firebaseConfig = {
         }
 
         // تحميل البيانات
-        async function loadData() {
-            try {
-                console.log('جاري تحميل البيانات...');
+// تحميل البيانات
+async function loadData() {
+    try {
+        console.log('جاري تحميل البيانات...');
+        
+        // محاولة تحميل من Firebase مع وقت انتظار
+        const loadWithTimeout = async (key) => {
+            return new Promise((resolve) => {
+                const timeout = setTimeout(() => {
+                    console.log(`⏰ timeout لـ ${key}`);
+                    resolve(null);
+                }, 5000);
                 
-                // تحميل جميع البيانات من Firebase
-                users = await Database.getItem('users') || [];
-                categories = await Database.getItem('categories') || [];
-                products = await Database.getItem('products') || [];
-                offers = await Database.getItem('offers') || [];
-                ratings = await Database.getItem('ratings') || [];
-                favorites = await Database.getItem('favorites') || [];
-                orders = await Database.getItem('orders') || [];
-                cart = await Database.getItem('cart') || [];
-                
-                // تحميل المستخدم الحالي من localStorage فقط (لأنه خاص بكل مستخدم)
-                try {
-                    const currentUserData = localStorage.getItem('currentUser');
-                    currentUser = currentUserData ? JSON.parse(currentUserData) : null;
-                } catch (error) {
-                    console.error('خطأ في تحميل المستخدم الحالي:', error);
-                    currentUser = null;
-                }
-                
-                // إذا لم تكن هناك بيانات، تهيئة البيانات الافتراضية
-                if (users.length === 0 && categories.length === 0 && products.length === 0) {
-                    console.log('لا توجد بيانات، جاري التهيئة...');
-                    await initializeDefaultData();
-                    // إعادة تحميل البيانات بعد التهيئة
-                    users = await Database.getItem('users') || [];
-                    categories = await Database.getItem('categories') || [];
-                    products = await Database.getItem('products') || [];
-                }
-                
-                console.log('تم تحميل البيانات بنجاح:', {
-                    users: users.length,
-                    categories: categories.length,
-                    products: products.length
+                Database.getItem(key).then(data => {
+                    clearTimeout(timeout);
+                    resolve(data);
+                }).catch(() => {
+                    clearTimeout(timeout);
+                    resolve(null);
                 });
-                
-            } catch (error) {
-                console.error('خطأ في تحميل البيانات:', error);
-                showNotification('حدث خطأ في تحميل البيانات', 'error');
-                
-                // محاولة التهيئة مرة أخرى
-                await initializeDefaultData();
-            }
+            });
+        };
+        
+        // تحميل البيانات مع fallback
+        users = await loadWithTimeout('users') || [];
+        categories = await loadWithTimeout('categories') || [];
+        products = await loadWithTimeout('products') || [];
+        offers = await loadWithTimeout('offers') || [];
+        ratings = await loadWithTimeout('ratings') || [];
+        favorites = await loadWithTimeout('favorites') || [];
+        orders = await loadWithTimeout('orders') || [];
+        cart = await loadWithTimeout('cart') || [];
+        
+        // إذا فشل كل شيء، استخدم البيانات الافتراضية
+        if (users.length === 0 && categories.length === 0 && products.length === 0) {
+            console.log('🚨 استخدام البيانات الافتراضية');
+            await initializeDefaultData();
         }
-
+        
+    } catch (error) {
+        console.error('❌ خطأ في تحميل البيانات:', error);
+        // استخدام البيانات الافتراضية في حالة الخطأ
+        await initializeDefaultData();
+    }
+}
         // حفظ البيانات
         async function saveData() {
             try {
@@ -2966,25 +2965,37 @@ const firebaseConfig = {
         }
 
         // تهيئة التطبيق
-        async function init() {
-            try {
-                await loadData();
-                setupEventListeners();
-                setupRealtimeUpdates();
-                render();
-                
-                // إخفاء شاشة التحميل بعد 2 ثانية
-                setTimeout(() => {
-                    elements.loadingScreen.classList.add('hidden');
-                }, 2000);
-                
-            } catch (error) {
-                console.error('خطأ في تهيئة التطبيق:', error);
-                elements.loadingScreen.classList.add('hidden');
-                showNotification('حدث خطأ في تحميل التطبيق', 'error');
-            }
+// تهيئة التطبيق
+async function init() {
+    try {
+        // إخفاء شاشة التحميل بعد 3 ثواني كحد أقصى
+        const loadingTimeout = setTimeout(() => {
+            elements.loadingScreen.classList.add('hidden');
+            showNotification('تم تحميل التطبيق (وضع الاسترجاع)', 'info');
+        }, 3000);
+        
+        await loadData();
+        setupEventListeners();
+        
+        // إلغاء المهلة وإخفاء شاشة التحميل
+        clearTimeout(loadingTimeout);
+        elements.loadingScreen.classList.add('hidden');
+        
+        // إعداد التحديثات الفورية (إذا كان Firebase يعمل)
+        try {
+            setupRealtimeUpdates();
+        } catch (firebaseError) {
+            console.log('⚠️ Firebase غير متوفر، سيتم العمل محلياً');
         }
-
+        
+        render();
+        
+    } catch (error) {
+        console.error('❌ خطأ في تهيئة التطبيق:', error);
+        elements.loadingScreen.classList.add('hidden');
+        showNotification('تم تحميل التطبيق بالوضع المحلي', 'info');
+    }
+}
         // بدء التطبيق
         init();
     </script>
