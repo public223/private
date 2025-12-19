@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ألعابي - مسابقات</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo-container">
+            <img src="images/logo.png" alt="شعار مسابقات" class="logo">
+        </div>
+        <nav class="main-nav">
+            <span class="user-email" id="userEmailDisplay"></span>
+            <a href="create-game.html" class="nav-link"><i class="fas fa-play"></i> العب</a>
+            <a href="contact.html" class="nav-link"><i class="fas fa-envelope"></i> تواصل معنا</a>
+            <a href="my-games.html" class="nav-link active"><i class="fas fa-gamepad"></i> ألعابي</a>
+            <button class="nav-link logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
+        </nav>
+    </header>
+
+    <main class="my-games-page">
+        <section class="games-header">
+            <h1><i class="fas fa-history"></i> سجل ألعابي</h1>
+            <p>شاهد جميع الألعاب التي لعبتها سابقاً</p>
+        </section>
+
+        <section class="games-filter">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="gameSearch" placeholder="ابحث عن لعبة...">
+            </div>
+            
+            <div class="filter-container">
+                <select id="gameFilter" class="filter-select">
+                    <option value="all">كل الألعاب</option>
+                    <option value="win">الفوز فقط</option>
+                    <option value="lose">الخسارة فقط</option>
+                    <option value="recent">الأحدث أولاً</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="games-grid">
+            <!-- سيتم ملء هذا القسم بواسطة JavaScript -->
+        </section>
+
+        <!-- نافذة تفاصيل اللعبة -->
+        <div class="game-details-modal" id="gameDetailsModal">
+            <div class="modal-content">
+                <span class="close-modal-btn">&times;</span>
+                <h2 id="modalGameName">اسم اللعبة</h2>
+                
+                <div class="modal-game-teams">
+                    <div class="modal-team team1">
+                        <h3 id="modalTeam1Name">الفريق الأول</h3>
+                        <div class="team-members" id="modalTeam1Members">
+                            <!-- سيتم ملء الأعضاء بواسطة JavaScript -->
+                        </div>
+                        <div class="team-score" id="modalTeam1Score">0 نقطة</div>
+                    </div>
+                    
+                    <div class="vs-circle">VS</div>
+                    
+                    <div class="modal-team team2">
+                        <h3 id="modalTeam2Name">الفريق الثاني</h3>
+                        <div class="team-members" id="modalTeam2Members">
+                            <!-- سيتم ملء الأعضاء بواسطة JavaScript -->
+                        </div>
+                        <div class="team-score" id="modalTeam2Score">0 نقطة</div>
+                    </div>
+                </div>
+                
+                <div class="modal-game-stats">
+                    <div class="stat-card">
+                        <i class="fas fa-trophy"></i>
+                        <h4>الفائز</h4>
+                        <p id="modalWinner">الفريق الأول</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-clock"></i>
+                        <h4>المدة</h4>
+                        <p id="modalDuration">30 دقيقة</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-calendar"></i>
+                        <h4>التاريخ</h4>
+                        <p id="modalDate">2023-10-15</p>
+                    </div>
+                </div>
+                
+                <div class="modal-game-categories">
+                    <h3><i class="fas fa-tags"></i> الفئات المستخدمة</h3>
+                    <div class="categories-list" id="modalCategoriesList">
+                        <!-- سيتم ملء الفئات بواسطة JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="modal-btn play-again-btn"><i class="fas fa-redo"></i> إعادة اللعب</button>
+                    <button class="modal-btn share-btn"><i class="fas fa-share-alt"></i> مشاركة</button>
+                    <button class="modal-btn close-modal-btn">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <p>تم صنع اللعبة من قبل علي صلاح الشمري ©</p>
+    </footer>
+
+    <script src="js/my-games.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // عرض بريد المستخدم الحالي
+        document.addEventListener('DOMContentLoaded', function() {
+            const userEmail = localStorage.getItem('userEmail');
+            if (userEmail) {
+                document.getElementById('userEmailDisplay').textContent = userEmail;
+            }
+            
+            // زر تسجيل الخروج
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                localStorage.removeItem('isAuthenticated');
+                localStorage.removeItem('userEmail');
+                window.location.href = 'login.html';
+            });
+        });
+    </script>
+</body>
+</html>
