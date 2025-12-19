@@ -1,4 +1,4 @@
-const allowedEmail = "alialwawan23@gmail.com";
+const allowedEmail = "3mk_ali@gmail.com";
 
 // التحقق من تسجيل الدخول
 document.getElementById('loginForm')?.addEventListener('submit', function(e) {
