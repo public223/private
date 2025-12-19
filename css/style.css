@@ -18,8 +18,9 @@
 /* إضافة أنماط لوحة التحكم بالنقاط */
 body {
     position: relative;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0;
+    overflow-x: hidden;
 }
 
 .score-control {
@@ -27,13 +28,13 @@ body {
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 100px; /* ارتفاع ثابت كما في الصورة */
+    height: 100px;
     display: flex;
-    justify-content: space-between; /* توزيع الفريقين على الجانبين */
+    justify-content: space-between;
     align-items: center;
-    background-color: #303030; /* خلفية سوداء تمامًا */
+    background-color: #303030;
     border-top: 1px solid #333;
-    padding: 0 50px; /* مساحة أفقية */
+    padding: 0 20px;
     box-sizing: border-box;
     z-index: 1000;
 }
@@ -42,13 +43,14 @@ body {
     background: transparent;
     text-align: center;
     position: relative;
-    width: 300px; /* عرض ثابت */
+    width: 100%;
+    max-width: 300px;
 }
 
 .team-score-control h4 {
     margin: 0 0 10px 0;
     color: #ccc;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: normal;
 }
 
@@ -56,7 +58,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 25px;
+    gap: 15px;
 }
 
 .score-buttons button {
@@ -64,9 +66,9 @@ body {
     color: #fff;
     border: 2px solid #444;
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -80,11 +82,11 @@ body {
 }
 
 .score-value {
-    font-size: 30px;
+    font-size: 24px;
     font-weight: bold;
     color: #fff;
     text-align: center;
-    padding: 10px 20px;
+    padding: 8px 15px;
     border-radius: 8px;
 }
 
@@ -95,10 +97,10 @@ body {
     background: #333;
     border: 1px solid #555;
     color: #aaa;
-    font-size: 14px;
+    font-size: 12px;
     cursor: pointer;
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -126,12 +128,13 @@ body {
     box-shadow: none;
 }
 
-
 body {
     font-family: 'Tajawal', sans-serif;
     background-color: #f5f7fa;
     color: #333;
     direction: rtl;
+    font-size: 16px;
+    line-height: 1.5;
 }
 
 a {
@@ -146,16 +149,16 @@ button {
 
 /* أنماط صفحة تواصل معنا */
 .contact-page {
-    padding: 30px 5%;
+    padding: 20px 15px;
 }
 
 .contact-intro {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
 
 .contact-intro h1 {
-    font-size: 2.2rem;
+    font-size: 1.8rem;
     color: var(--dark-color);
     margin-bottom: 10px;
 }
@@ -167,12 +170,13 @@ button {
 
 .contact-intro p {
     color: var(--gray-color);
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
 .contact-container {
     display: flex;
-    gap: 40px;
+    flex-direction: column;
+    gap: 30px;
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -180,13 +184,13 @@ button {
 .contact-form-section, .contact-info-section {
     flex: 1;
     background-color: white;
-    border-radius: 15px;
-    padding: 30px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
 }
 
 .contact-form {
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 .contact-form textarea {
@@ -197,6 +201,7 @@ button {
     font-family: inherit;
     transition: all 0.3s;
     resize: vertical;
+    min-height: 120px;
 }
 
 .contact-form textarea:focus {
@@ -207,13 +212,13 @@ button {
 
 .submit-btn {
     width: 100%;
-    padding: 15px;
+    padding: 12px;
     background-color: var(--primary-color);
     color: white;
     border: none;
     border-radius: 8px;
     font-weight: bold;
-    font-size: 1.1rem;
+    font-size: 1rem;
     transition: all 0.3s;
     margin-top: 15px;
 }
@@ -229,12 +234,12 @@ button {
 }
 
 .contact-info {
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 .info-card {
-    margin-bottom: 25px;
-    padding-bottom: 25px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
     border-bottom: 1px solid #eee;
 }
 
@@ -245,65 +250,62 @@ button {
 }
 
 .info-icon {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     background-color: var(--primary-color);
     color: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
-    margin-bottom: 15px;
+    font-size: 1.1rem;
+    margin-bottom: 12px;
 }
 
 .info-card h3 {
     color: var(--dark-color);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+    font-size: 1.2rem;
 }
 
 .info-card p {
     color: var(--gray-color);
     line-height: 1.6;
+    font-size: 0.95rem;
 }
 
 .social-media {
-    margin-top: 30px;
+    margin-top: 25px;
 }
 
 .social-media h3 {
     color: var(--dark-color);
     margin-bottom: 15px;
+    font-size: 1.2rem;
 }
 
 .social-icons {
     display: flex;
-    gap: 15px;
+    gap: 12px;
+    justify-content: center;
 }
 
 .social-icon {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     background-color: var(--dark-color);
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     transition: all 0.3s;
 }
 
 .social-icon:hover {
     transform: translateY(-5px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-/* التكيف مع الشاشات الصغيرة */
-@media (max-width: 768px) {
-    .contact-container {
-        flex-direction: column;
-    }
 }
 
 /* أنماط تسجيل الدخول */
@@ -313,13 +315,14 @@ button {
     align-items: center;
     min-height: 100vh;
     background-color: #f5f7fa;
+    padding: 20px;
 }
 
 .login-box {
     background-color: white;
-    padding: 40px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 30px 25px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 400px;
     text-align: center;
@@ -327,8 +330,8 @@ button {
 
 .login-box h1 {
     color: #2c3e50;
-    margin-bottom: 30px;
-    font-size: 1.8rem;
+    margin-bottom: 25px;
+    font-size: 1.6rem;
 }
 
 .login-box h1 i {
@@ -337,15 +340,16 @@ button {
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
     text-align: right;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     font-weight: 500;
     color: #2c3e50;
+    font-size: 0.95rem;
 }
 
 .form-group input {
@@ -355,6 +359,7 @@ button {
     border-radius: 8px;
     font-family: 'Tajawal', sans-serif;
     transition: all 0.3s;
+    font-size: 1rem;
 }
 
 .form-group input:focus {
@@ -365,13 +370,13 @@ button {
 
 .login-btn {
     width: 100%;
-    padding: 15px;
+    padding: 14px;
     background-color: #e74c3c;
     color: white;
     border: none;
     border-radius: 8px;
     font-weight: bold;
-    font-size: 1.1rem;
+    font-size: 1rem;
     transition: all 0.3s;
     margin-top: 15px;
     cursor: pointer;
@@ -391,27 +396,34 @@ button {
 .main-header {
     background-color: white;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 15px 5%;
+    padding: 12px 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
 .logo-container .logo {
-    height: 80px;
+    height: 60px;
     width: auto;
+    max-width: 150px;
 }
 
 .main-nav {
     display: flex;
-    gap: 20px;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .nav-link {
-    padding: 8px 15px;
+    padding: 6px 12px;
     border-radius: 20px;
     transition: all 0.3s;
     font-weight: 500;
+    font-size: 0.95rem;
+    white-space: nowrap;
 }
 
 .nav-link.active, .nav-link:hover {
@@ -425,43 +437,48 @@ button {
 
 /* الصفحة الرئيسية */
 .home-page {
-    padding: 30px 5%;
+    padding: 20px 15px;
 }
 
 .hero-section {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 50px;
+    margin-bottom: 40px;
     background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
-    padding: 40px;
-    border-radius: 15px;
+    padding: 30px 20px;
+    border-radius: 12px;
+    text-align: center;
 }
 
 .hero-content {
     flex: 1;
+    margin-bottom: 30px;
 }
 
 .hero-content h1 {
-    font-size: 2.5rem;
+    font-size: 1.8rem;
     margin-bottom: 15px;
     color: var(--dark-color);
+    line-height: 1.3;
 }
 
 .hero-content p {
-    font-size: 1.2rem;
-    margin-bottom: 25px;
+    font-size: 1rem;
+    margin-bottom: 20px;
     color: var(--gray-color);
+    line-height: 1.6;
 }
 
 .cta-button {
     display: inline-block;
-    padding: 12px 25px;
+    padding: 10px 20px;
     background-color: var(--primary-color);
     color: white;
     border-radius: 30px;
     font-weight: bold;
     transition: all 0.3s;
+    font-size: 1rem;
 }
 
 .cta-button:hover {
@@ -477,24 +494,26 @@ button {
 .hero-image {
     flex: 1;
     text-align: center;
+    width: 100%;
 }
 
 .hero-image img {
     max-width: 100%;
     height: auto;
+    max-height: 300px;
     border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 /* قسم المميزات */
 .features-section {
-    margin: 60px 0;
+    margin: 40px 0;
 }
 
 .section-title {
     text-align: center;
-    margin-bottom: 40px;
-    font-size: 2rem;
+    margin-bottom: 30px;
+    font-size: 1.6rem;
     color: var(--dark-color);
     position: relative;
 }
@@ -502,22 +521,22 @@ button {
 .section-title::after {
     content: '';
     display: block;
-    width: 80px;
+    width: 60px;
     height: 4px;
     background-color: var(--primary-color);
-    margin: 15px auto;
+    margin: 12px auto;
     border-radius: 2px;
 }
 
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
 }
 
 .feature-card {
     background-color: white;
-    padding: 30px;
+    padding: 25px 20px;
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     transition: all 0.3s;
@@ -525,35 +544,37 @@ button {
 }
 
 .feature-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    transform: translateY(-8px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
 }
 
 .feature-icon {
-    width: 70px;
-    height: 70px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 20px;
+    margin: 0 auto 15px;
     color: white;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
 }
 
 .feature-card h3 {
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     color: var(--dark-color);
+    font-size: 1.3rem;
 }
 
 .feature-card p {
     color: var(--gray-color);
     line-height: 1.6;
+    font-size: 0.95rem;
 }
 
 /* قسم العملات */
 .currency-section {
-    margin: 60px 0;
+    margin: 40px 0;
     text-align: center;
 }
 
@@ -561,18 +582,19 @@ button {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
     margin-top: 20px;
 }
 
 .currency-option {
-    padding: 10px 20px;
+    padding: 8px 15px;
     border-radius: 30px;
     background-color: white;
     border: 1px solid #ddd;
     cursor: pointer;
     transition: all 0.3s;
     font-weight: 500;
+    font-size: 0.9rem;
 }
 
 .currency-option.selected {
@@ -588,21 +610,23 @@ button {
 /* قسم الهدايا */
 .gifts-section {
     background-color: white;
-    border-radius: 15px;
-    padding: 40px;
+    border-radius: 12px;
+    padding: 30px 20px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    margin: 60px 0;
+    margin: 40px 0;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    text-align: center;
 }
 
 .gifts-content {
     flex: 1;
+    margin-bottom: 25px;
 }
 
 .gifts-content h2 {
-    font-size: 2rem;
+    font-size: 1.6rem;
     margin-bottom: 10px;
     color: var(--dark-color);
 }
@@ -610,16 +634,18 @@ button {
 .gifts-content p {
     color: var(--gray-color);
     margin-bottom: 20px;
+    line-height: 1.6;
 }
 
 .gift-button {
-    padding: 12px 25px;
+    padding: 10px 20px;
     background-color: var(--success-color);
     color: white;
     border: none;
     border-radius: 30px;
     font-weight: bold;
     transition: all 0.3s;
+    font-size: 1rem;
 }
 
 .gift-button:hover {
@@ -635,34 +661,37 @@ button {
 .gifts-image {
     flex: 1;
     text-align: center;
+    width: 100%;
 }
 
 .gifts-image img {
     max-width: 100%;
     height: auto;
+    max-height: 250px;
 }
 
 /* فوتر الصفحة */
 .main-footer {
     text-align: center;
-    padding: 20px;
+    padding: 15px;
     background-color: var(--dark-color);
     color: white;
-    margin-top: 50px;
+    margin-top: 40px;
+    font-size: 0.9rem;
 }
 
 /* صفحة إنشاء اللعبة */
 .create-game-page {
-    padding: 30px 5%;
+    padding: 20px 15px;
 }
 
 .game-creation-intro {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
 
 .game-creation-intro h1 {
-    font-size: 2.2rem;
+    font-size: 1.8rem;
     color: var(--dark-color);
     margin-bottom: 10px;
 }
@@ -674,24 +703,26 @@ button {
 
 .game-creation-intro p {
     color: var(--gray-color);
-    font-size: 1.1rem;
-    margin-bottom: 30px;
+    font-size: 1rem;
+    margin-bottom: 25px;
 }
 
 .creation-options {
     display: flex;
     justify-content: center;
-    gap: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
     margin-top: 20px;
 }
 
 .creation-option {
-    padding: 12px 25px;
+    padding: 10px 20px;
     border-radius: 30px;
     background-color: white;
     border: 1px solid #ddd;
     font-weight: 500;
     transition: all 0.3s;
+    font-size: 0.95rem;
 }
 
 .creation-option.active {
@@ -707,9 +738,9 @@ button {
 /* دول */
 .countries-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 20px;
-    margin: 30px 0;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
+    margin: 25px 0;
 }
 
 .country-card {
@@ -733,18 +764,19 @@ button {
 
 .country-card img {
     width: 100%;
-    height: 100px;
+    height: 90px;
     object-fit: cover;
 }
 
 .country-card p {
     padding: 10px;
     font-weight: 500;
+    font-size: 0.95rem;
 }
 
 /* البحث */
 .search-section {
-    margin: 40px 0;
+    margin: 30px 0;
 }
 
 .search-container {
@@ -752,15 +784,15 @@ button {
     align-items: center;
     background-color: white;
     border-radius: 30px;
-    padding: 5px 15px;
+    padding: 5px 12px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    max-width: 800px;
+    max-width: 100%;
     margin: 0 auto;
 }
 
 .search-icon {
     color: var(--gray-color);
-    font-size: 1.2rem;
+    font-size: 1.1rem;
 }
 
 .search-container input {
@@ -770,16 +802,18 @@ button {
     font-family: inherit;
     outline: none;
     background: transparent;
+    font-size: 1rem;
 }
 
 .search-button {
-    padding: 8px 20px;
+    padding: 8px 15px;
     background-color: var(--primary-color);
     color: white;
     border: none;
     border-radius: 30px;
     font-weight: 500;
     transition: all 0.3s;
+    font-size: 0.95rem;
 }
 
 .search-button:hover {
@@ -793,16 +827,17 @@ button {
 .search-info {
     text-align: center;
     margin-top: 20px;
-    padding: 15px;
+    padding: 12px;
     background-color: #f8f9fa;
     border-radius: 10px;
-    max-width: 800px;
+    max-width: 100%;
     margin: 20px auto 0;
 }
 
 .search-info p {
     color: var(--gray-color);
     line-height: 1.6;
+    font-size: 0.95rem;
 }
 
 .search-info i {
@@ -813,25 +848,21 @@ button {
 /* الفئات */
 .categories-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    margin: 30px 0;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin: 25px 0;
 }
 
 .category-card {
     background-color: white;
-    border-radius: 12px;
+    border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     transition: all 0.3s;
     cursor: pointer;
-
     display: flex;
     flex-direction: column;
 }
-
-
-
 
 .category-card.selected {
     box-shadow: 0 0 0 3px var(--primary-color);
@@ -842,10 +873,9 @@ button {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
 }
 
-
 .category-card img {
     width: 100%;
-    height: 140px; /* مثل المثال */
+    height: 120px;
     object-fit: cover;
     display: block;
 }
@@ -856,22 +886,18 @@ button {
     text-align: center;
     padding: 8px 4px;
     background: #fff;
-    font-size: clamp(14px, 1.4vw, 16px);
+    font-size: 0.95rem;
 }
 
 .category-card h3 {
-    background-color: #ff7a45; /* لون واضح مثل الصورة */
+    background-color: #ff7a45;
     color: white;
-
     margin: 0;
-    padding: 12px;
+    padding: 10px;
     text-align: center;
-
-    font-size: 16px;
+    font-size: 0.95rem;
     font-weight: 600;
 }
-
-
 
 .category-check {
     position: absolute;
@@ -895,27 +921,28 @@ button {
 
 /* معلومات الفرق */
 .teams-info-section {
-    margin: 50px 0;
+    margin: 40px 0;
 }
 
 .teams-form {
     background-color: white;
-    border-radius: 15px;
-    padding: 30px;
+    border-radius: 12px;
+    padding: 25px 20px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    max-width: 1000px;
+    max-width: 100%;
     margin: 0 auto;
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     font-weight: 500;
     color: var(--dark-color);
+    font-size: 0.95rem;
 }
 
 .form-group label i {
@@ -930,6 +957,7 @@ button {
     border-radius: 8px;
     font-family: inherit;
     transition: all 0.3s;
+    font-size: 1rem;
 }
 
 .form-group input:focus {
@@ -940,10 +968,10 @@ button {
 
 .teams-container {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    margin-top: 30px;
-    gap: 30px;
+    margin-top: 25px;
+    gap: 25px;
 }
 
 .team-form {
@@ -951,12 +979,15 @@ button {
     background-color: #f8f9fa;
     padding: 20px;
     border-radius: 10px;
+    width: 100%;
+    max-width: 400px;
 }
 
 .team-form h3 {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     color: var(--dark-color);
+    font-size: 1.3rem;
 }
 
 .team-form h3 i {
@@ -965,8 +996,8 @@ button {
 }
 
 .vs-circle {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     background-color: var(--primary-color);
     color: white;
     border-radius: 50%;
@@ -974,18 +1005,19 @@ button {
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+    margin: 15px 0;
 }
 
 /* بدء اللعبة */
 .start-game-section {
     text-align: center;
-    margin: 50px 0;
+    margin: 40px 0;
 }
 
 .start-game-button {
-    padding: 15px 40px;
+    padding: 14px 30px;
     background-color: var(--success-color);
     color: white;
     border: none;
@@ -993,6 +1025,8 @@ button {
     font-weight: bold;
     font-size: 1.1rem;
     transition: all 0.3s;
+    width: 100%;
+    max-width: 300px;
 }
 
 .start-game-button:disabled {
@@ -1014,6 +1048,7 @@ button {
 .start-game-note {
     margin-top: 15px;
     color: var(--gray-color);
+    font-size: 0.9rem;
 }
 
 .start-game-note i {
@@ -1024,24 +1059,27 @@ button {
 /* صفحة اللعبة */
 .game-header {
     background-color: white;
-    padding: 15px 5%;
+    padding: 12px 15px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 15px;
 }
 
 .game-header-left h1 {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     color: var(--dark-color);
+    text-align: center;
 }
 
 .current-player-display {
     background-color: var(--secondary-color);
     color: white;
-    padding: 8px 20px;
+    padding: 8px 15px;
     border-radius: 30px;
     font-weight: 500;
+    text-align: center;
+    font-size: 0.95rem;
 }
 
 .current-player-display i {
@@ -1049,12 +1087,14 @@ button {
 }
 
 .game-control-btn {
-    padding: 8px 15px;
+    padding: 8px 12px;
     border-radius: 30px;
     border: none;
     font-weight: 500;
     transition: all 0.3s;
-    margin-right: 10px;
+    margin: 5px;
+    font-size: 0.9rem;
+    flex: 1;
 }
 
 .game-control-btn i {
@@ -1077,46 +1117,37 @@ button {
 }
 
 .game-board-container {
-    padding: 150px 15%;
+    padding: 120px 10px 100px;
 }
 
 .categories-board {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 أعمدة لكل صف */
-    grid-template-rows: repeat(2, auto);    /* صفين */
-    gap: 40px; /* مسافة أكبر بين الأعمدة والصفوف */
-    margin-top: 50px;
-    padding: 0 5%;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    margin-top: 40px;
+    padding: 0 10px;
 }
-
 
 .category-column {
     display: grid;
-    grid-template-columns:
-        clamp(80px, 8vw, 120px)   /* العمود الأول: يكبر حسب حجم الشاشة */
-        1fr                       /* العمود الأوسط يبقى مرن */
-        clamp(80px, 8vw, 120px);  /* العمود الأخير: نفس الحجم */
+    grid-template-columns: 80px 1fr 80px;
     align-items: center;
-    gap: clamp(16px, 3vw, 40px); /* مسافة أكبر بين الأعمدة بطريقة متناسبة */
+    gap: 20px;
 }
 
-
 .point-option {
-    height: clamp(44px, 5vw, 64px);
-    min-width: clamp(44px, 5vw, 64px);
-    
+    height: 50px;
+    min-width: 50px;
     background: #4b4b4b;
     color: #fff;
-    
-    border-radius: 999px;
-    font-size: clamp(14px, 1.6vw, 20px);
+    border-radius: 50px;
+    font-size: 16px;
     font-weight: 800;
-    
     display: flex;
     align-items: center;
     justify-content: center;
-    
     cursor: pointer;
+    transition: all 0.3s;
 }
 
 .point-option.used {
@@ -1127,33 +1158,25 @@ button {
 .points-group {
     display: flex;
     flex-direction: column;
-    gap: clamp(8px, 1.5vw, 16px);
+    gap: 12px;
 }
-
-
-
-.point-option {
-    height: 60px;
-    font-size: 21px;
-}
-
-
 
 /* عرض السؤال */
 .question-display {
     display: none;
     background-color: white;
-    border-radius: 15px;
-    padding: 30px;
+    border-radius: 12px;
+    padding: 25px 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    margin-top: 30px;
+    margin-top: 25px;
+    margin-bottom: 20px;
 }
 
 .question-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 25px;
     padding-bottom: 15px;
     border-bottom: 1px solid #eee;
 }
@@ -1161,36 +1184,43 @@ button {
 .question-category {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
+    justify-content: center;
 }
 
 .question-category img {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
     object-fit: cover;
 }
 
 .question-category h3 {
     color: var(--dark-color);
+    font-size: 1.2rem;
 }
 
 .question-points {
     font-weight: bold;
-    font-size: 1.5rem; /* زيادة حجم الخط أيضاً */
+    font-size: 1.3rem;
     color: white;
     background-color: orange;
-    border-radius: 25px; /* زيادة نصف قطر الزوايا */
-    padding: 12px 24px; /* زيادة الحشوة الداخلية */
-    /* أو: padding: 1rem 2rem; */
+    border-radius: 20px;
+    padding: 10px 20px;
+    text-align: center;
+    display: inline-block;
 }
+
 .question-timer {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
     background-color: #f8f9fa;
     padding: 8px 15px;
     border-radius: 30px;
+    width: fit-content;
+    margin: 0 auto;
 }
 
 .question-timer i {
@@ -1206,24 +1236,24 @@ button {
 
 .question-content {
     text-align: center;
-    margin: 30px 0;
+    margin: 25px 0;
 }
 
 #questionText {
-    font-size: 1.5rem;
-    margin-bottom: 30px;
+    font-size: 1.3rem;
+    margin-bottom: 25px;
     color: var(--dark-color);
     line-height: 1.6;
 }
 
 .question-image-container {
-    margin: 30px auto;
-    max-width: 600px;
+    margin: 25px auto;
+    max-width: 100%;
 }
 
 .question-image-container img {
     max-width: 100%;
-    max-height: 300px;
+    max-height: 250px;
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
@@ -1231,9 +1261,9 @@ button {
 /* لوحة الفريقين */
 .teams-panel {
     display: flex;
-    justify-content: space-between;
-    gap: 30px;
-    margin: 40px 0;
+    flex-direction: column;
+    gap: 25px;
+    margin: 30px 0;
 }
 
 .team-panel {
@@ -1255,26 +1285,27 @@ button {
 
 .team-info {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .team-info h3 {
     color: var(--dark-color);
     margin-bottom: 10px;
+    font-size: 1.2rem;
 }
 
 /* صفحة ألعابي */
 .my-games-page {
-    padding: 30px 5%;
+    padding: 20px 15px;
 }
 
 .games-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
 
 .games-header h1 {
-    font-size: 2.2rem;
+    font-size: 1.8rem;
     color: var(--dark-color);
     margin-bottom: 10px;
 }
@@ -1286,20 +1317,19 @@ button {
 
 .games-header p {
     color: var(--gray-color);
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
 .games-filter {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    gap: 20px;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 25px;
 }
 
 .games-filter .search-container {
-    flex: 1;
-    max-width: 500px;
+    width: 100%;
+    max-width: 100%;
 }
 
 #gameFilter {
@@ -1309,17 +1339,19 @@ button {
     font-family: inherit;
     background-color: white;
     color: var(--dark-color);
+    width: 100%;
+    font-size: 1rem;
 }
 
 .games-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
 }
 
 .game-card {
     background-color: white;
-    border-radius: 15px;
+    border-radius: 12px;
     padding: 20px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     transition: all 0.3s;
@@ -1332,8 +1364,8 @@ button {
 
 .game-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 10px;
     margin-bottom: 15px;
     padding-bottom: 15px;
     border-bottom: 1px solid #eee;
@@ -1341,24 +1373,26 @@ button {
 
 .game-header h3 {
     color: var(--dark-color);
-    font-size: 1.3rem;
+    font-size: 1.2rem;
+    text-align: center;
 }
 
 .game-date {
     color: var(--gray-color);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    text-align: center;
 }
 
 .game-teams {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    margin: 20px 0;
     gap: 15px;
+    margin: 15px 0;
 }
 
 .team {
-    flex: 1;
+    width: 100%;
     text-align: center;
     padding: 15px;
     border-radius: 10px;
@@ -1381,7 +1415,7 @@ button {
     color: white;
     padding: 3px 10px;
     border-radius: 30px;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: bold;
 }
 
@@ -1390,12 +1424,14 @@ button {
     font-weight: bold;
     margin-bottom: 5px;
     color: var(--dark-color);
+    font-size: 1.1rem;
 }
 
 .team-score {
     display: block;
     color: var(--primary-color);
     font-weight: bold;
+    font-size: 1.3rem;
 }
 
 .team2 .team-score {
@@ -1412,10 +1448,11 @@ button {
     align-items: center;
     justify-content: center;
     font-weight: bold;
+    font-size: 0.9rem;
 }
 
 .game-details {
-    margin: 20px 0;
+    margin: 15px 0;
 }
 
 .detail {
@@ -1424,6 +1461,7 @@ button {
     gap: 10px;
     margin-bottom: 10px;
     color: var(--gray-color);
+    font-size: 0.9rem;
 }
 
 .detail i {
@@ -1434,12 +1472,13 @@ button {
 
 .game-actions {
     display: flex;
+    flex-direction: column;
     gap: 10px;
     margin-top: 20px;
 }
 
 .action-btn {
-    flex: 1;
+    width: 100%;
     padding: 10px;
     border-radius: 8px;
     border: none;
@@ -1449,6 +1488,7 @@ button {
     align-items: center;
     justify-content: center;
     gap: 8px;
+    font-size: 0.95rem;
 }
 
 .view-btn {
@@ -1479,14 +1519,15 @@ button {
     z-index: 1000;
     align-items: center;
     justify-content: center;
+    padding: 20px;
 }
 
 .game-details-modal .modal-content {
     background-color: white;
-    border-radius: 15px;
-    padding: 30px;
-    width: 90%;
-    max-width: 800px;
+    border-radius: 12px;
+    padding: 25px 20px;
+    width: 100%;
+    max-width: 500px;
     max-height: 90vh;
     overflow-y: auto;
     position: relative;
@@ -1494,21 +1535,19 @@ button {
 
 #modalGameName {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     color: var(--dark-color);
-    font-size: 1.8rem;
+    font-size: 1.5rem;
 }
 
 .modal-game-teams {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 30px;
-    margin: 30px 0;
+    flex-direction: column;
+    gap: 20px;
+    margin: 25px 0;
 }
 
 .modal-team {
-    flex: 1;
     padding: 20px;
     border-radius: 10px;
     background-color: #f8f9fa;
@@ -1523,6 +1562,7 @@ button {
     text-align: center;
     margin-bottom: 15px;
     color: var(--dark-color);
+    font-size: 1.2rem;
 }
 
 .team-members {
@@ -1537,6 +1577,7 @@ button {
     padding: 8px;
     background-color: white;
     border-radius: 8px;
+    font-size: 0.95rem;
 }
 
 .member i {
@@ -1556,9 +1597,9 @@ button {
 
 .modal-game-stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
-    margin: 30px 0;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin: 25px 0;
 }
 
 .stat-card {
@@ -1570,23 +1611,24 @@ button {
 }
 
 .stat-card i {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     color: var(--primary-color);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .stat-card h4 {
     color: var(--dark-color);
     margin-bottom: 5px;
+    font-size: 1rem;
 }
 
 .stat-card p {
     color: var(--gray-color);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
 .modal-game-categories {
-    margin: 30px 0;
+    margin: 25px 0;
 }
 
 .modal-game-categories h3 {
@@ -1594,7 +1636,9 @@ button {
     color: var(--dark-color);
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
+    font-size: 1.2rem;
 }
 
 .modal-game-categories h3 i {
@@ -1604,52 +1648,38 @@ button {
 .categories-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
+    justify-content: center;
 }
 
 .category-tag {
     background-color: #f8f9fa;
-    padding: 5px 15px;
+    padding: 5px 12px;
     border-radius: 30px;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--dark-color);
 }
 
 .modal-actions {
     display: flex;
-    gap: 15px;
-    margin-top: 30px;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 25px;
 }
 
 .modal-actions .modal-btn {
-    flex: 1;
+    width: 100%;
     padding: 12px;
-}
-
-/* التكيف مع الشاشات الصغيرة */
-@media (max-width: 768px) {
-    .games-filter {
-        flex-direction: column;
-    }
-    
-    .games-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .modal-game-teams {
-        flex-direction: column;
-    }
-    
-    .modal-actions {
-        flex-direction: column;
-    }
+    font-size: 1rem;
 }
 
 /* أنماط الهيدر */
 .main-nav {
     display: flex;
-    gap: 20px;
+    gap: 10px;
     align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .user-email {
@@ -1657,13 +1687,15 @@ button {
     color: white;
     padding: 5px 10px;
     border-radius: 15px;
-    font-size: 0.9rem;
-    margin-right: auto;
+    font-size: 0.85rem;
+    text-align: center;
+    width: 100%;
+    order: -1;
 }
 
 .team-score {
     font-weight: bold;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
 }
 
 .team1-panel .team-score {
@@ -1677,16 +1709,17 @@ button {
 .team-help-options {
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
 .help-option-btn {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
     border: none;
     background-color: white;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1717,17 +1750,18 @@ button {
 /* أزرار الإجابة */
 .answer-controls {
     display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 30px;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 25px;
 }
 
 .answer-btn {
-    padding: 12px 25px;
+    padding: 12px 20px;
     border-radius: 30px;
     border: none;
     font-weight: bold;
     transition: all 0.3s;
+    font-size: 1rem;
 }
 
 .team1-answer-btn {
@@ -1762,14 +1796,15 @@ button {
     z-index: 1000;
     align-items: center;
     justify-content: center;
+    padding: 20px;
 }
 
 .modal-content {
     background-color: white;
-    border-radius: 15px;
-    padding: 30px;
-    width: 90%;
-    max-width: 500px;
+    border-radius: 12px;
+    padding: 25px 20px;
+    width: 100%;
+    max-width: 400px;
     position: relative;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
@@ -1778,7 +1813,7 @@ button {
     position: absolute;
     top: 15px;
     left: 15px;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     cursor: pointer;
     color: var(--gray-color);
 }
@@ -1787,15 +1822,17 @@ button {
     text-align: center;
     margin-bottom: 20px;
     color: var(--dark-color);
+    font-size: 1.4rem;
 }
 
 #helpModalContent {
     line-height: 1.6;
     text-align: center;
+    font-size: 1rem;
 }
 
 .friend-answer {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: bold;
     margin: 20px 0;
     padding: 15px;
@@ -1804,7 +1841,7 @@ button {
 }
 
 .friend-call-animation {
-    font-size: 3rem;
+    font-size: 2.5rem;
     color: var(--primary-color);
     margin: 20px 0;
     animation: pulse 1.5s infinite;
@@ -1823,6 +1860,7 @@ button {
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s;
+    font-size: 0.95rem;
 }
 
 .answer-option:hover {
@@ -1830,7 +1868,7 @@ button {
 }
 
 .hole-animation {
-    font-size: 3rem;
+    font-size: 2.5rem;
     color: var(--warning-color);
     margin: 20px 0;
     animation: shake 0.5s infinite;
@@ -1848,39 +1886,43 @@ button {
     z-index: 1000;
     align-items: center;
     justify-content: center;
+    padding: 20px;
 }
 
 .winner-modal .modal-content {
     text-align: center;
-    padding: 40px;
+    padding: 30px 25px;
+    width: 100%;
+    max-width: 400px;
 }
 
 #winnerTitle {
-    font-size: 2rem;
+    font-size: 1.6rem;
     margin-bottom: 20px;
     color: var(--dark-color);
 }
 
 .winner-score {
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: bold;
-    margin: 30px 0;
+    margin: 25px 0;
     color: var(--success-color);
 }
 
 .winner-actions {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    margin-top: 30px;
+    gap: 12px;
+    margin-top: 25px;
 }
 
 .modal-btn {
-    padding: 12px 25px;
+    padding: 12px 20px;
     border-radius: 30px;
     border: none;
     font-weight: bold;
     transition: all 0.3s;
+    font-size: 1rem;
 }
 
 .play-again-btn {
@@ -1916,6 +1958,9 @@ button {
     color: var(--danger-color);
     cursor: pointer;
     transition: all 0.3s;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
 }
 
 .logout-btn:hover {
@@ -1928,9 +1973,9 @@ button {
     background: none;
     border: none;
     color: var(--gray-color);
-    font-size: 16px;
+    font-size: 14px;
     cursor: pointer;
-    padding: 5px 10px;
+    padding: 5px;
     border-radius: 5px;
     transition: all 0.3s;
 }
@@ -1940,32 +1985,20 @@ button {
     color: var(--danger-color);
 }
 
-/* تحسين عرض الفريقين في صفحة اللعبة */
-.team1-control .score-buttons button:hover {
-    background-color: #c0392b;
-}
-
-.team2-control .score-buttons button:hover {
-    background-color: #e67e22;
-}
-
 /* تحسين أزرار التحكم في اللعبة */
+.game-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+}
+
 .game-control-btn {
-    margin-left: 10px;
-    transition: all 0.3s;
-}
-
-.end-game-btn:hover {
-    background-color: #c0392b;
-}
-
-.back-to-board-btn:hover {
-    background-color: #7f8c8d;
-}
-
-.exit-game-btn:hover {
-    background-color: #f8f9fa;
-    border-color: var(--primary-color);
+    margin: 0;
+    flex: 1;
+    min-width: 120px;
+    max-width: 200px;
 }
 
 /* تحسين النافذة المنبثقة */
@@ -1991,7 +2024,7 @@ button {
     margin: 5px 0;
 }
 
-.point-option:hover:not([style*="opacity: 0.5"]) {
+.point-option:hover:not(.used) {
     transform: scale(1.05);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
@@ -2005,53 +2038,11 @@ button {
     box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
 }
 
-/* تحسين تنسيق الفلاتر */
-.filter-select {
-    padding: 8px 15px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    background-color: white;
-    font-family: 'Tajawal', sans-serif;
-    cursor: pointer;
-}
-
-.filter-select:focus {
-    outline: none;
-    border-color: var(--primary-color);
-}
-
 /* تحسين أزرار الوسائل المساعدة */
 .help-option-btn:not(:disabled):hover {
     transform: scale(1.1);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
-
-/* تحسين أزرار الإجابة */
-.answer-btn {
-    transition: all 0.3s;
-    position: relative;
-    overflow: hidden;
-}
-
-.answer-btn::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 5px;
-    height: 5px;
-    background: rgba(255, 255, 255, 0.5);
-    opacity: 0;
-    border-radius: 100%;
-    transform: scale(1, 1) translate(-50%);
-    transform-origin: 50% 50%;
-}
-
-.answer-btn:focus:not(:active)::after {
-    animation: ripple 1s ease-out;
-}
-
-
 
 /* تأثيرات الحركة */
 @keyframes pulse {
@@ -2068,42 +2059,312 @@ button {
     100% { transform: rotate(0deg); }
 }
 
-/* التكيف مع الشاشات الصغيرة */
-@media (max-width: 768px) {
+/* إضافة Media Queries للتكيف مع أحجام الشاشات المختلفة */
+
+/* للأجهزة اللوحية (768px وما فوق) */
+@media (min-width: 768px) {
+    .contact-page,
+    .home-page,
+    .create-game-page,
+    .my-games-page {
+        padding: 25px 5%;
+    }
+    
+    .main-header {
+        padding: 15px 5%;
+        flex-wrap: nowrap;
+    }
+    
+    .logo-container .logo {
+        height: 70px;
+    }
+    
+    .main-nav {
+        gap: 15px;
+    }
+    
+    .nav-link {
+        padding: 8px 15px;
+        font-size: 1rem;
+    }
+    
+    .user-email {
+        width: auto;
+        order: 0;
+        margin-right: auto;
+    }
+    
+    .contact-container {
+        flex-direction: row;
+        gap: 30px;
+    }
+    
     .hero-section {
-        flex-direction: column;
-        text-align: center;
+        flex-direction: row;
+        text-align: right;
+        padding: 40px;
     }
     
-    .hero-content, .hero-image {
-        width: 100%;
+    .hero-content {
+        margin-bottom: 0;
+        text-align: right;
     }
     
-    .hero-image {
-        margin-top: 30px;
+    .hero-content h1 {
+        font-size: 2.2rem;
+    }
+    
+    .gifts-section {
+        flex-direction: row;
+        text-align: right;
+        padding: 40px;
+    }
+    
+    .gifts-content {
+        margin-bottom: 0;
+        text-align: right;
     }
     
     .teams-container {
-        flex-direction: column;
+        flex-direction: row;
+        gap: 30px;
     }
     
     .vs-circle {
-        margin: 20px 0;
+        margin: 0;
+    }
+    
+    .game-header {
+        flex-direction: row;
+        padding: 15px 5%;
+    }
+    
+    .game-header-left h1 {
+        text-align: right;
+        font-size: 1.4rem;
+    }
+    
+    .game-controls {
+        width: auto;
+        justify-content: flex-end;
+    }
+    
+    .game-control-btn {
+        flex: none;
+        min-width: auto;
     }
     
     .categories-board {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 40px;
+        padding: 0 5%;
     }
     
     .teams-panel {
-        flex-direction: column;
+        flex-direction: row;
+        gap: 30px;
     }
     
     .answer-controls {
-        flex-direction: column;
+        flex-direction: row;
+        justify-content: center;
     }
     
     .answer-btn {
-        width: 100%;
+        min-width: 150px;
+    }
+    
+    .games-filter {
+        flex-direction: row;
+        align-items: center;
+    }
+    
+    .games-filter .search-container {
+        max-width: 400px;
+    }
+    
+    .game-actions {
+        flex-direction: row;
+    }
+    
+    .action-btn {
+        width: auto;
+        flex: 1;
+    }
+    
+    .modal-game-teams {
+        flex-direction: row;
+    }
+    
+    .modal-actions {
+        flex-direction: row;
+    }
+    
+    .modal-actions .modal-btn {
+        width: auto;
+        flex: 1;
+    }
+}
+
+/* للحواسيب المكتبية (1024px وما فوق) */
+@media (min-width: 1024px) {
+    .contact-page,
+    .home-page,
+    .create-game-page,
+    .my-games-page {
+        padding: 30px 5%;
+    }
+    
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+    
+    .hero-content p {
+        font-size: 1.1rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .features-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .countries-grid {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+    
+    .categories-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+    
+    .categories-board {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .game-board-container {
+        padding: 150px 10% 100px;
+    }
+    
+    .point-option {
+        height: 60px;
+        min-width: 60px;
+        font-size: 18px;
+    }
+    
+    #questionText {
+        font-size: 1.5rem;
+    }
+    
+    .games-grid {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    }
+    
+    .game-details-modal .modal-content {
+        max-width: 600px;
+        padding: 30px;
+    }
+    
+    #modalGameName {
+        font-size: 1.8rem;
+    }
+    
+    .modal-game-stats {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* للحواسيب الكبيرة (1200px وما فوق) */
+@media (min-width: 1200px) {
+    .game-board-container {
+        padding: 150px 15% 100px;
+    }
+    
+    .categories-board {
+        padding: 0 10%;
+    }
+    
+    .game-details-modal .modal-content {
+        max-width: 800px;
+    }
+}
+
+/* تحسينات للأجهزة الصغيرة جداً (أقل من 375px) */
+@media (max-width: 374px) {
+    .score-control {
+        height: 90px;
+        padding: 0 10px;
+    }
+    
+    .score-buttons button {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+    }
+    
+    .score-value {
+        font-size: 20px;
+        padding: 6px 12px;
+    }
+    
+    .team-score-control h4 {
+        font-size: 14px;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .categories-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .game-card {
+        padding: 15px;
+    }
+    
+    .games-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-content {
+        padding: 20px 15px;
+    }
+    
+    .help-option-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+}
+
+/* تصحيح مشكلة الزووم على الأجهزة المحمولة */
+@media (max-width: 767px) {
+    input, select, textarea, button {
+        font-size: 16px !important; /* منع الزووم على iOS */
+    }
+}
+
+/* تحسين التمرير على الأجهزة المحمولة */
+@media (max-width: 767px) {
+    body {
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .modal-content {
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+}
+
+/* إصلاحات للعرض على iOS */
+@supports (-webkit-touch-callout: none) {
+    body {
+        min-height: -webkit-fill-available;
+    }
+    
+    .login-container {
+        min-height: -webkit-fill-available;
     }
 }
