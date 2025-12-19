@@ -3,3121 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Falcon Store</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <title>مسابقات - لعبة المسابقات التفاعلية</title>
+    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- إضافة Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-    
-    <style>
-        .line-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.5s ease-out;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        .slide-in {
-            animation: slideIn 0.3s ease-out;
-        }
-        
-        /* Custom scrollbar */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 10px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
-        
-        /* Notification styles */
-        .notification {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
-            padding: 15px 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 500;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            transform: translateX(-150%);
-            transition: transform 0.3s ease;
-        }
-        
-        .notification.show {
-            transform: translateX(0);
-        }
-        
-        .notification.success {
-            background: linear-gradient(to right, #10b981, #059669);
-        }
-        
-        .notification.error {
-            background: linear-gradient(to right, #ef4444, #dc2626);
-        }
-        
-        .notification.info {
-            background: linear-gradient(to right, #3b82f6, #2563eb);
-        }
-        
-        /* Discount badge */
-        .discount-badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: linear-gradient(to right, #ef4444, #dc2626);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            z-index: 10;
-        }
-        
-        /* Star rating */
-        .star-rating {
-            color: #fbbf24;
-        }
-        
-        /* Price styles */
-        .original-price {
-            text-decoration: line-through;
-            color: #9ca3af;
-            font-size: 0.9rem;
-        }
-        
-        /* Favorite button */
-        .favorite-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-            transition: all 0.3s ease;
-        }
-        
-        .favorite-btn:hover {
-            background: rgba(255, 255, 255, 1);
-            transform: scale(1.1);
-        }
-        
-        .favorite-btn.active {
-            color: #ef4444;
-        }
-        
-        /* Error message styles */
-        .error-message {
-            color: #ef4444;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-        
-        /* Input error state */
-        .input-error {
-            border-color: #ef4444 !important;
-        }
-        
-        /* Payment modal styles */
-        .payment-method {
-            border: 2px solid #e5e7eb;
-            border-radius: 0.75rem;
-            padding: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .payment-method:hover {
-            border-color: #3b82f6;
-        }
-        
-        .payment-method.selected {
-            border-color: #3b82f6;
-            background-color: #eff6ff;
-        }
-        
-        /* Invoice styles */
-        .invoice-item {
-            border-bottom: 1px solid #e5e7eb;
-            padding: 0.75rem 0;
-        }
-        
-        .invoice-item:last-child {
-            border-bottom: none;
-        }
-        
-        /* Product modal styles */
-        .product-modal {
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        /* Quantity selector */
-        .quantity-selector {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 15px 0;
-        }
-        
-        .quantity-btn {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: #f1f5f9;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        
-        .quantity-btn:hover {
-            background: #e2e8f0;
-        }
-        
-        .quantity-input {
-            width: 60px;
-            text-align: center;
-            border: 1px solid #d1d5db;
-            border-radius: 5px;
-            padding: 5px;
-        }
-
-        /* Loading spinner */
-        .loading-spinner {
-            border: 3px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 3px solid #3b82f6;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
-<body class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-    <div id="app">
-        <!-- Notification Container -->
-        <div id="notificationContainer"></div>
-        
-        <!-- Loading Screen -->
-        <div id="loadingScreen" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
-            <div class="text-center">
-                <div class="loading-spinner"></div>
-                <p class="mt-4 text-slate-600">جاري تحميل المتجر...</p>
-            </div>
+<body>
+    <header class="main-header">
+        <div class="logo-container">
+            <img src="images/logo.png" alt="شعار مسابقات" class="logo">
         </div>
-        
-        <!-- Header -->
-        <header class="bg-white shadow-lg sticky top-0 z-50">
-            <div class="container mx-auto px-4 py-4">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-4">
-                        <button id="mobileMenuToggle" class="lg:hidden p-2 hover:bg-slate-100 rounded-lg">
-                            <i class="fas fa-bars text-xl"></i>
-                        </button>
-                        
-                        <!-- الصورة المضافة -->
-                        <img src="https://media.discordapp.net/attachments/1226391111052824638/1441481032108085309/image-removebg-preview.png?ex=6921f353&is=6920a1d3&hm=8434db68f810681943f3ca6599f7880ff1c1d576e24e8fe550d56bacd1ae0f3f&=&format=webp&quality=lossless" 
-                             alt="Falcon Store Logo" 
-                             class="h-10 w-10 lg:h-12 lg:w-12 object-contain">
-                        
-                        <h1 class="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                            Falcon Store
-                        </h1>
-                    </div>
+        <nav class="main-nav">
+            <span class="user-email" id="userEmailDisplay"></span>
+            <a href="create-game.html" class="nav-link active"><i class="fas fa-play"></i> العب</a>
+            <a href="contact.html" class="nav-link"><i class="fas fa-envelope"></i> تواصل معنا</a>
+            <a href="my-games.html" class="nav-link"><i class="fas fa-gamepad"></i> ألعابي</a>
+            <button class="nav-link logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
+        </nav>
+    </header>
 
-                    <!-- Search Bar -->
-                    <div class="hidden md:flex flex-1 max-w-md mx-4">
-                        <div class="relative w-full">
-                            <input type="text" id="searchInput" placeholder="ابحث عن منتج..." class="w-full px-4 py-2 pr-10 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none">
-                            <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
-                        </div>
-                    </div>
-
-                    <nav class="hidden lg:flex items-center gap-6">
-                        <button id="homeBtn" class="px-4 py-2 rounded-lg font-medium transition-all bg-blue-600 text-white shadow-lg">
-                            المنتجات
-                        </button>
-                        <button id="favoritesBtn" class="px-4 py-2 rounded-lg font-medium transition-all text-slate-700 hover:bg-slate-100">
-                            <i class="fas fa-heart mr-1"></i> المفضلة
-                        </button>
-                        <button id="ordersBtn" class="px-4 py-2 rounded-lg font-medium transition-all text-slate-700 hover:bg-slate-100 hidden">
-                            <i class="fas fa-receipt mr-1"></i> طلباتي
-                        </button>
-                        <button id="adminBtn" class="px-4 py-2 rounded-lg font-medium transition-all text-slate-700 hover:bg-slate-100 hidden">
-                            لوحة التحكم
-                        </button>
-                    </nav>
-
-                    <div class="flex items-center gap-3">
-                        <button id="cartBtn" class="relative p-2.5 bg-slate-100 hover:bg-slate-200 rounded-lg transition-all">
-                            <i class="fas fa-shopping-cart text-xl"></i>
-                            <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold hidden">
-                                0
-                            </span>
-                        </button>
-
-                        <div id="userSection" class="hidden">
-                            <div class="flex items-center gap-2">
-                                <span id="username" class="hidden sm:inline text-sm font-medium text-slate-700"></span>
-                                <button id="logoutBtn" class="p-2.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-all">
-                                    <i class="fas fa-sign-out-alt text-xl"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div id="loginSection">
-                            <button id="loginBtn" class="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all font-medium">
-                                <i class="fas fa-sign-in-alt text-xl"></i>
-                                <span class="hidden sm:inline">دخول</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Mobile Search Bar -->
-                <div class="md:hidden mt-4">
-                    <div class="relative">
-                        <input type="text" id="mobileSearchInput" placeholder="ابحث عن منتج..." class="w-full px-4 py-2 pr-10 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none">
-                        <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
-                    </div>
-                </div>
-
-                <!-- Mobile Menu -->
-                <div id="mobileMenu" class="lg:hidden mt-4 pb-2 border-t pt-4 hidden">
-                    <nav class="flex flex-col gap-2">
-                        <button id="mobileHomeBtn" class="px-4 py-2 rounded-lg font-medium text-right bg-blue-600 text-white">
-                            المنتجات
-                        </button>
-                        <button id="mobileFavoritesBtn" class="px-4 py-2 rounded-lg font-medium text-right text-slate-700 hover:bg-slate-100">
-                            <i class="fas fa-heart mr-2"></i> المفضلة
-                        </button>
-                        <button id="mobileOrdersBtn" class="px-4 py-2 rounded-lg font-medium text-right text-slate-700 hover:bg-slate-100 hidden">
-                            <i class="fas fa-receipt mr-2"></i> طلباتي
-                        </button>
-                        <button id="mobileAdminBtn" class="px-4 py-2 rounded-lg font-medium text-right text-slate-700 hover:bg-slate-100 hidden">
-                            لوحة التحكم
-                        </button>
-                    </nav>
-                </div>
+    <main class="home-page">
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1>اختبر معلوماتك مع أصدقائك!</h1>
+                <p>لعبة مسابقات تفاعلية مليئة بالتحديات والمتعة</p>
+                <a href="create-game.html" class="cta-button">ابدأ اللعبة الآن <i class="fas fa-arrow-left"></i></a>
             </div>
-        </header>
+            <div class="hero-image">
+                <img src="images/ui/game-hero.png" alt="صورة اللعبة">
+            </div>
+        </section>
 
-        <!-- Main Content -->
-        <main class="container mx-auto px-4 py-8">
-            <!-- Home Page -->
-            <div id="homePage">
-                <!-- Search and Filters -->
-                <div class="mb-8 bg-white p-4 rounded-xl shadow-md">
-                    <div class="flex flex-col md:flex-row gap-4">
-                        <!-- Categories Filter -->
-                        <div class="flex-1">
-                            <h2 class="text-lg font-bold mb-2 flex items-center gap-2">
-                                <i class="fas fa-th-large text-xl"></i>
-                                الفئات
-                            </h2>
-                            <div class="flex flex-wrap gap-2" id="categoriesList">
-                                <button class="px-4 py-2 rounded-lg font-medium transition-all bg-blue-600 text-white shadow-md" data-category="all">
-                                    الكل
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Price Filter -->
-                        <div class="md:w-64">
-                            <h2 class="text-lg font-bold mb-2 flex items-center gap-2">
-                                <i class="fas fa-filter text-xl"></i>
-                                التصفية بالسعر
-                            </h2>
-                            <div class="flex gap-2">
-                                <select id="priceFilter" class="w-full px-4 py-2 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none">
-                                    <option value="all">جميع الأسعار</option>
-                                    <option value="0-50">أقل من 50 ر.س</option>
-                                    <option value="50-100">50 - 100 ر.س</option>
-                                    <option value="100-200">100 - 200 ر.س</option>
-                                    <option value="200+">أكثر من 200 ر.س</option>
-                                </select>
-                            </div>
-                        </div>
+        <section class="features-section">
+            <h2 class="section-title">مميزات اللعبة</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background-color: #3498db;">
+                        <i class="fas fa-phone-alt"></i>
                     </div>
-                </div>
-
-                <!-- Special Offers Section -->
-                <div class="mb-8" id="offersSection">
-                    <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
-                        <i class="fas fa-tag text-xl text-red-500"></i>
-                        العروض الخاصة
-                    </h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="offersGrid">
-                        <!-- Special offers will be dynamically added here -->
-                    </div>
-                    <div id="emptyOffers" class="text-center py-8 hidden">
-                        <i class="fas fa-tag text-5xl mx-auto text-slate-300 mb-4"></i>
-                        <p class="text-slate-500 text-lg">لا توجد عروض خاصة حالياً</p>
-                    </div>
-                </div>
-
-                <!-- Products Grid -->
-                <div class="mb-4 flex justify-between items-center">
-                    <h2 class="text-2xl font-bold">جميع المنتجات</h2>
-                    <div class="flex items-center gap-2">
-                        <span class="text-slate-600">ترتيب حسب:</span>
-                        <select id="sortProducts" class="px-3 py-1 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500">
-                            <option value="default">الإفتراضي</option>
-                            <option value="price-low">السعر: من الأقل للأعلى</option>
-                            <option value="price-high">السعر: من الأعلى للأقل</option>
-                            <option value="name">الاسم</option>
-                            <option value="rating">التقييم</option>
-                        </select>
-                    </div>
+                    <h3>اتصال بصديق</h3>
+                    <p>صديقك اللي يعرف كل شي هذا وقته دق عليه! تستخدمها بعد ما تشوف السؤال</p>
                 </div>
                 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="productsGrid">
-                    <!-- Products will be dynamically added here -->
-                </div>
-
-                <div id="emptyProducts" class="text-center py-16 hidden">
-                    <i class="fas fa-box text-6xl mx-auto text-slate-300 mb-4"></i>
-                    <p class="text-slate-500 text-lg">لا توجد منتجات في هذه الفئة</p>
-                </div>
-            </div>
-
-            <!-- Favorites Page -->
-            <div id="favoritesPage" class="hidden">
-                <h2 class="text-3xl font-bold mb-8">منتجاتي المفضلة</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="favoritesGrid">
-                    <!-- Favorite products will be dynamically added here -->
-                </div>
-                <div id="emptyFavorites" class="text-center py-16 hidden">
-                    <i class="fas fa-heart text-6xl mx-auto text-slate-300 mb-4"></i>
-                    <p class="text-slate-500 text-lg">لا توجد منتجات في قائمة المفضلة</p>
-                    <button id="browseProductsFromFavorites" class="mt-4 px-6 py-3 bg-blue-600 text-white rounded-lg hover:shadow-lg transition-all font-medium">
-                        تصفح المنتجات
-                    </button>
-                </div>
-            </div>
-
-            <!-- Orders Page -->
-            <div id="ordersPage" class="hidden">
-                <h2 class="text-3xl font-bold mb-8">طلباتي السابقة</h2>
-                <div id="ordersList" class="space-y-6">
-                    <!-- Orders will be dynamically added here -->
-                </div>
-                <div id="emptyOrders" class="text-center py-16 hidden">
-                    <i class="fas fa-receipt text-6xl mx-auto text-slate-300 mb-4"></i>
-                    <p class="text-slate-500 text-lg">لا توجد طلبات سابقة</p>
-                </div>
-            </div>
-
-            <!-- Cart Page -->
-            <div id="cartPage" class="max-w-4xl mx-auto hidden">
-                <h2 class="text-3xl font-bold mb-8">سلة التسوق</h2>
-                <div id="emptyCart" class="bg-white rounded-xl shadow-md p-12 text-center">
-                    <i class="fas fa-shopping-cart text-6xl mx-auto text-slate-300 mb-4"></i>
-                    <p class="text-slate-500 text-lg mb-6">سلة التسوق فارغة</p>
-                    <button id="browseProductsBtn" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:shadow-lg transition-all font-medium">
-                        تصفح المنتجات
-                    </button>
-                </div>
-                <div id="cartItems" class="space-y-6 hidden">
-                    <!-- Cart items will be dynamically added here -->
-                    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl shadow-lg p-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <span class="text-lg">المجموع الكلي:</span>
-                            <span id="totalCart" class="text-3xl font-bold">0.00 ر.س</span>
-                        </div>
-                        <button id="checkoutBtn" class="w-full py-4 bg-white text-blue-600 rounded-lg font-bold text-lg hover:shadow-xl transition-all">
-                            إتمام الشراء
-                        </button>
+                <div class="feature-card">
+                    <div class="feature-icon" style="background-color: #e74c3c;">
+                        <i class="fas fa-question"></i>
                     </div>
-                </div>
-            </div>
-
-            <!-- Admin Page -->
-            <div id="adminPage" class="hidden">
-                <h2 class="text-3xl font-bold mb-8">لوحة التحكم</h2>
-
-                <!-- Admin Tabs -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Products Management -->
-                    <div class="bg-white rounded-xl shadow-md p-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-xl font-bold flex items-center gap-2">
-                                <i class="fas fa-box text-xl"></i>
-                                إدارة المنتجات
-                            </h3>
-                            <button id="addProductBtn" class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:shadow-lg transition-all">
-                                <i class="fas fa-plus text-xl"></i>
-                                إضافة منتج
-                            </button>
-                        </div>
-
-                        <div class="space-y-3 max-h-96 overflow-y-auto custom-scrollbar" id="adminProductsList">
-                            <!-- Products will be dynamically added here -->
-                        </div>
-                    </div>
-
-                    <!-- Categories Management -->
-                    <div class="bg-white rounded-xl shadow-md p-6">
-                        <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
-                            <i class="fas fa-th-large text-xl"></i>
-                            إدارة الفئات
-                        </h3>
-
-                        <form id="addCategoryForm" class="mb-6">
-                            <div class="flex gap-2">
-                                <input type="text" id="categoryName" placeholder="اسم الفئة" class="flex-1 px-4 py-2 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none" required>
-                                <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:shadow-lg transition-all font-medium">
-                                    إضافة
-                                </button>
-                            </div>
-                        </form>
-
-                        <div class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar" id="adminCategoriesList">
-                            <!-- Categories will be dynamically added here -->
-                        </div>
-                    </div>
-                    
-                    <!-- Offers Management -->
-                    <div class="bg-white rounded-xl shadow-md p-6 lg:col-span-2">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-xl font-bold flex items-center gap-2">
-                                <i class="fas fa-tag text-xl text-red-500"></i>
-                                إدارة العروض
-                            </h3>
-                            <button id="addOfferBtn" class="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:shadow-lg transition-all">
-                                <i class="fas fa-plus text-xl"></i>
-                                إضافة عرض
-                            </button>
-                        </div>
-                        
-                        <div class="space-y-3 max-h-96 overflow-y-auto custom-scrollbar" id="adminOffersList">
-                            <!-- Offers will be dynamically added here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <!-- Auth Modal -->
-        <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
-            <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
-                <h2 id="authTitle" class="text-2xl font-bold mb-6 text-center">تسجيل الدخول</h2>
-                <form id="authForm" class="space-y-4">
-                    <div>
-                        <input type="text" id="usernameInput" placeholder="اسم المستخدم" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none" required>
-                        <div id="usernameError" class="error-message hidden">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <span></span>
-                        </div>
-                    </div>
-                    <div id="emailField" class="hidden">
-                        <input type="email" id="emailInput" placeholder="البريد الإلكتروني" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none">
-                        <div id="emailError" class="error-message hidden">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <span></span>
-                        </div>
-                    </div>
-                    <div>
-                        <input type="password" id="passwordInput" placeholder="كلمة المرور" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none" required>
-                        <div id="passwordError" class="error-message hidden">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <span></span>
-                        </div>
-                    </div>
-                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-bold hover:shadow-lg transition-all">
-                        دخول
-                    </button>
-                </form>
-                <div class="mt-6 text-center">
-                    <button id="toggleAuthMode" class="text-blue-600 hover:underline font-medium">
-                        ليس لديك حساب؟ سجل الآن
-                    </button>
-                </div>
-                <button id="cancelAuth" class="mt-4 w-full py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-all">
-                    إلغاء
-                </button>
-            </div>
-        </div>
-
-        <!-- Payment Modal -->
-        <div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
-            <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl">
-                <h2 class="text-2xl font-bold mb-6 text-center">إتمام عملية الدفع</h2>
-                
-                <div class="mb-6">
-                    <h3 class="text-lg font-bold mb-4">اختر طريقة الدفع</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div class="payment-method" data-method="card">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-credit-card text-blue-600"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium">بطاقة ائتمان</p>
-                                    <p class="text-sm text-slate-500">Visa, MasterCard</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="payment-method" data-method="bank">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-university text-green-600"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium">تحويل بنكي</p>
-                                    <p class="text-sm text-slate-500">KNET, حوالة بنكية</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <h3>جواب جوابين</h3>
+                    <p>متردد بجوابين؟ هذي لك! جاوب بالأثنين عشان تضمن النقاط</p>
                 </div>
                 
-                <!-- Credit Card Form -->
-                <div id="cardPaymentForm" class="space-y-4 hidden">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium mb-2">رقم البطاقة</label>
-                            <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none" maxlength="19">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-2">تاريخ الانتهاء</label>
-                            <input type="text" id="cardExpiry" placeholder="MM/YY" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none" maxlength="5">
-                        </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="background-color: #2ecc71;">
+                        <i class="fas fa-digging"></i>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium mb-2">CVV</label>
-                            <input type="text" id="cardCvv" placeholder="123" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none" maxlength="3">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-2">اسم حامل البطاقة</label>
-                            <input type="text" id="cardHolder" placeholder="اسم حامل البطاقة" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none">
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Bank Transfer Form -->
-                <div id="bankPaymentForm" class="space-y-4 hidden">
-                    <div class="bg-blue-50 p-4 rounded-lg">
-                        <h4 class="font-bold text-blue-800 mb-2">معلومات التحويل البنكي</h4>
-                        <p class="text-blue-700 text-sm">يرجى تحويل المبلغ إلى الحساب التالي:</p>
-                        <div class="mt-2 space-y-1 text-sm">
-                            <p><span class="font-medium">اسم البنك:</span> البنك الأهلي الكويتي</p>
-                            <p><span class="font-medium">رقم الحساب:</span> KW12 1234 5678 9012 3456 7890 1234</p>
-                            <p><span class="font-medium">اسم المستفيد:</span> Falcon Store</p>
-                            <p><span class="font-medium">المبلغ:</span> <span id="bankAmount">0.00 ر.س</span></p>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-2">رقم المرجع</label>
-                        <input type="text" id="bankReference" placeholder="أدخل رقم المرجع البنكي" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none">
-                    </div>
-                </div>
-                
-                <div class="flex gap-3 pt-4">
-                    <button id="confirmPayment" class="flex-1 py-3 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-lg font-bold hover:shadow-lg transition-all">
-                        تأكيد الدفع
-                    </button>
-                    <button id="cancelPayment" class="px-6 py-3 bg-slate-200 text-slate-700 rounded-lg font-medium hover:bg-slate-300 transition-all">
-                        إلغاء
-                    </button>
+                    <h3>الحفرة</h3>
+                    <p>احفر لهم! جاوب صح، واخصم عدد النقاط اللي فزت فيها من نقاط الفريق الثاني</p>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Invoice Modal -->
-        <div id="invoiceModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
-            <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-screen overflow-y-auto">
-                <div class="text-center mb-6">
-                    <h2 class="text-2xl font-bold text-green-600">تمت عملية الدفع بنجاح!</h2>
-                    <p class="text-slate-600">شكراً لشرائك من متجرنا</p>
-                </div>
-                
-                <div class="border-2 border-slate-200 rounded-xl p-6 mb-6">
-                    <div class="flex justify-between items-start mb-6">
-                        <div>
-                            <h3 class="text-xl font-bold">فاتورة شراء</h3>
-                            <p id="invoiceNumber" class="text-slate-500">رقم الفاتورة: #</p>
-                            <p id="invoiceDate" class="text-slate-500">التاريخ: </p>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-bold">Falcon Store</p>
-                            <p class="text-slate-500">الكويت</p>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <h4 class="font-bold mb-2">المنتجات المشتراة:</h4>
-                        <div id="invoiceItems" class="space-y-3">
-                            <!-- Invoice items will be dynamically added here -->
-                        </div>
-                    </div>
-                    
-                    <div class="border-t pt-4">
-                        <div class="flex justify-between mb-2">
-                            <span>المجموع الفرعي:</span>
-                            <span id="invoiceSubtotal">0.00 ر.س</span>
-                        </div>
-                        <div class="flex justify-between mb-2">
-                            <span>ضريبة القيمة المضافة (5%):</span>
-                            <span id="invoiceTax">0.00 ر.س</span>
-                        </div>
-                        <div class="flex justify-between font-bold text-lg">
-                            <span>المجموع الكلي:</span>
-                            <span id="invoiceTotal">0.00 ر.س</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="text-center">
-                    <button id="printInvoice" class="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:shadow-lg transition-all mr-2">
-                        <i class="fas fa-print mr-2"></i>طباعة الفاتورة
-                    </button>
-                    <button id="closeInvoice" class="px-6 py-3 bg-slate-200 text-slate-700 rounded-lg font-medium hover:bg-slate-300 transition-all">
-                        إغلاق
-                    </button>
-                </div>
+        <section class="currency-section">
+            <h2 class="section-title">اختر عملة الدولة</h2>
+            <div class="currency-selector">
+                <div class="currency-option selected" data-currency="SAR">🇸🇦 SAR</div>
+                <div class="currency-option" data-currency="KWD">🇰🇼 KWD</div>
+                <div class="currency-option" data-currency="OMR">🇴🇲 OMR</div>
+                <div class="currency-option" data-currency="QAR">🇶🇦 QAR</div>
+                <div class="currency-option" data-currency="AED">🇦🇪 AED</div>
+                <div class="currency-option" data-currency="BHD">🇧🇭 BHD</div>
             </div>
-        </div>
+        </section>
 
-        <!-- Admin Product Modal -->
-        <div id="adminProductModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto hidden">
-            <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl my-8 product-modal">
-                <h2 id="productModalTitle" class="text-2xl font-bold mb-6">إضافة منتج جديد</h2>
-                <form id="productForm" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-2">اسم المنتج</label>
-                        <input type="text" id="productName" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-2">السعر (ر.س)</label>
-                        <input type="number" step="0.01" id="productPrice" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-2">رابط الصورة</label>
-                        <input type="url" id="productImage" placeholder="https://example.com/image.jpg" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-2">الفئة</label>
-                        <select id="productCategory" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none" required>
-                            <option value="">اختر الفئة</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-2">الوصف</label>
-                        <textarea id="productDescription" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none" rows="4" required></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-2">الكمية المتاحة</label>
-                        <input type="number" min="1" max="100" id="productQuantity" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none" value="1" required>
-                    </div>
-                    <div class="flex gap-3 pt-4">
-                        <button type="submit" class="flex-1 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-bold hover:shadow-lg transition-all">
-                            إضافة
-                        </button>
-                        <button type="button" id="cancelProductModal" class="px-6 py-3 bg-slate-200 text-slate-700 rounded-lg font-medium hover:bg-slate-300 transition-all">
-                            إلغاء
-                        </button>
-                    </div>
-                </form>
+        <section class="gifts-section">
+            <div class="gifts-content">
+                <h2>قسم الهدايا</h2>
+                <p>احصل على ميزات إضافية وهدايا مميزة</p>
+                <button class="gift-button"><i class="fas fa-gift"></i> اشتر لعبة جديدة</button>
             </div>
-        </div>
-        
-        <!-- Admin Offer Modal -->
-        <div id="adminOfferModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto hidden">
-            <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl my-8">
-                <h2 id="offerModalTitle" class="text-2xl font-bold mb-6">إضافة عرض جديد</h2>
-                <form id="offerForm" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-2">المنتج</label>
-                        <select id="offerProduct" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none" required>
-                            <option value="">اختر المنتج</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-2">نسبة الخصم (%)</label>
-                        <input type="number" min="1" max="100" id="offerDiscount" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none" required>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium mb-2">تاريخ البدء</label>
-                            <input type="date" id="offerStartDate" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-2">تاريخ الانتهاء</label>
-                            <input type="date" id="offerEndDate" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none" required>
-                        </div>
-                    </div>
-                    <div class="flex gap-3 pt-4">
-                        <button type="submit" class="flex-1 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-lg font-bold hover:shadow-lg transition-all">
-                            إضافة
-                        </button>
-                        <button type="button" id="cancelOfferModal" class="px-6 py-3 bg-slate-200 text-slate-700 rounded-lg font-medium hover:bg-slate-300 transition-all">
-                            إلغاء
-                        </button>
-                    </div>
-                </form>
+            <div class="gifts-image">
+                <img src="images/ui/gifts.png" alt="هدايا">
             </div>
-        </div>
+        </section>
+    </main>
 
-        <!-- Product Details Modal -->
-        <div id="productDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
-            <div class="bg-white rounded-2xl p-8 max-w-4xl w-full shadow-2xl max-h-screen overflow-y-auto product-modal">
-                <div class="flex justify-between items-start mb-6">
-                    <h2 id="productDetailsTitle" class="text-2xl font-bold">تفاصيل المنتج</h2>
-                    <button id="closeProductDetails" class="p-2 text-slate-500 hover:bg-slate-100 rounded-lg">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div>
-                        <img id="productDetailsImage" src="" alt="" class="w-full h-80 object-cover rounded-xl">
-                    </div>
-                    <div>
-                        <h3 id="productDetailsName" class="text-2xl font-bold mb-4"></h3>
-                        <p id="productDetailsDescription" class="text-slate-600 mb-6"></p>
-                        <div class="flex items-center justify-between mb-6">
-                            <div>
-                                <span id="productDetailsPrice" class="text-3xl font-bold text-blue-600"></span>
-                                <span id="productDetailsOriginalPrice" class="original-price hidden"></span>
-                            </div>
-                            <div class="star-rating flex">
-                                <span id="productDetailsRating" class="text-slate-500 ml-2"></span>
-                            </div>
-                        </div>
-                        <div class="quantity-selector">
-                            <label class="block text-sm font-medium mb-2">الكمية:</label>
-                            <div class="flex items-center gap-2">
-                                <button id="decreaseQuantity" class="quantity-btn">-</button>
-                                <input type="number" id="productQuantityInput" min="1" max="100" value="1" class="quantity-input">
-                                <button id="increaseQuantity" class="quantity-btn">+</button>
-                            </div>
-                        </div>
-                        <div class="flex gap-3 mt-6">
-                            <button id="addToCartFromDetails" class="flex-1 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-bold hover:shadow-lg transition-all">
-                                إضافة للسلة
-                            </button>
-                            <button id="toggleFavoriteFromDetails" class="p-3 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-all">
-                                <i class="fas fa-heart text-xl"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <footer class="main-footer">
+        <p>تم صنع اللعبة من قبل علي صلاح الشمري ©</p>
+    </footer>
 
-        <!-- Footer -->
-        <footer class="bg-white mt-16 py-8 border-t">
-            <div class="container mx-auto px-4 text-center">
-                <p class="text-slate-600">
-                    © 2025 فالكون ستور - جميع الحقوق محفوظة
-                </p>
-                <div class="mt-4 space-y-2">
-                    <p class="text-sm text-slate-500">
-                        <strong>تم التطوير باستخدام Firebase - جميع المستخدمين يشاهدون نفس البيانات</strong> 
-                    </p>
-                </div>
-                <button id="resetSystemBtn" class="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all">
-                    تحديث الموقع
-                </button>
-            </div>
-        </footer>
-    </div>
-
+    <script src="js/game.js"></script>
+    <script src="js/auth.js"></script>
     <script>
-        // State management
-        let currentUser = null;
-        let users = [];
-        let products = [];
-        let categories = [];
-        let offers = [];
-        let cart = [];
-        let favorites = [];
-        let ratings = [];
-        let orders = [];
-        let currentPage = 'home';
-        let selectedCategory = 'all';
-        let selectedPriceFilter = 'all';
-        let searchQuery = '';
-        let sortOption = 'default';
-        let isLogin = true;
-        let editingProduct = null;
-        let editingOffer = null;
-        let selectedPaymentMethod = null;
-        let currentProductDetails = null;
-
-        // DOM Elements
-        const elements = {
-            // Navigation
-            homeBtn: document.getElementById('homeBtn'),
-            adminBtn: document.getElementById('adminBtn'),
-            favoritesBtn: document.getElementById('favoritesBtn'),
-            ordersBtn: document.getElementById('ordersBtn'),
-            mobileHomeBtn: document.getElementById('mobileHomeBtn'),
-            mobileAdminBtn: document.getElementById('mobileAdminBtn'),
-            mobileFavoritesBtn: document.getElementById('mobileFavoritesBtn'),
-            mobileOrdersBtn: document.getElementById('mobileOrdersBtn'),
-            cartBtn: document.getElementById('cartBtn'),
-            mobileMenuToggle: document.getElementById('mobileMenuToggle'),
-            mobileMenu: document.getElementById('mobileMenu'),
-            
-            // Search
-            searchInput: document.getElementById('searchInput'),
-            mobileSearchInput: document.getElementById('mobileSearchInput'),
-            
-            // User section
-            userSection: document.getElementById('userSection'),
-            loginSection: document.getElementById('loginSection'),
-            username: document.getElementById('username'),
-            logoutBtn: document.getElementById('logoutBtn'),
-            loginBtn: document.getElementById('loginBtn'),
-            
-            // Pages
-            homePage: document.getElementById('homePage'),
-            favoritesPage: document.getElementById('favoritesPage'),
-            ordersPage: document.getElementById('ordersPage'),
-            cartPage: document.getElementById('cartPage'),
-            adminPage: document.getElementById('adminPage'),
-            
-            // Home page elements
-            categoriesList: document.getElementById('categoriesList'),
-            productsGrid: document.getElementById('productsGrid'),
-            emptyProducts: document.getElementById('emptyProducts'),
-            offersSection: document.getElementById('offersSection'),
-            offersGrid: document.getElementById('offersGrid'),
-            emptyOffers: document.getElementById('emptyOffers'),
-            priceFilter: document.getElementById('priceFilter'),
-            sortProducts: document.getElementById('sortProducts'),
-            
-            // Favorites page elements
-            favoritesGrid: document.getElementById('favoritesGrid'),
-            emptyFavorites: document.getElementById('emptyFavorites'),
-            browseProductsFromFavorites: document.getElementById('browseProductsFromFavorites'),
-            
-            // Orders page elements
-            ordersList: document.getElementById('ordersList'),
-            emptyOrders: document.getElementById('emptyOrders'),
-            
-            // Cart page elements
-            emptyCart: document.getElementById('emptyCart'),
-            cartItems: document.getElementById('cartItems'),
-            totalCart: document.getElementById('totalCart'),
-            browseProductsBtn: document.getElementById('browseProductsBtn'),
-            checkoutBtn: document.getElementById('checkoutBtn'),
-            cartCount: document.getElementById('cartCount'),
-            
-            // Admin page elements
-            addProductBtn: document.getElementById('addProductBtn'),
-            adminProductsList: document.getElementById('adminProductsList'),
-            addCategoryForm: document.getElementById('addCategoryForm'),
-            adminCategoriesList: document.getElementById('adminCategoriesList'),
-            categoryName: document.getElementById('categoryName'),
-            addOfferBtn: document.getElementById('addOfferBtn'),
-            adminOffersList: document.getElementById('adminOffersList'),
-            
-            // Auth modal elements
-            authModal: document.getElementById('authModal'),
-            authTitle: document.getElementById('authTitle'),
-            authForm: document.getElementById('authForm'),
-            usernameInput: document.getElementById('usernameInput'),
-            emailInput: document.getElementById('emailInput'),
-            passwordInput: document.getElementById('passwordInput'),
-            emailField: document.getElementById('emailField'),
-            usernameError: document.getElementById('usernameError'),
-            emailError: document.getElementById('emailError'),
-            passwordError: document.getElementById('passwordError'),
-            toggleAuthMode: document.getElementById('toggleAuthMode'),
-            cancelAuth: document.getElementById('cancelAuth'),
-            
-            // Payment modal elements
-            paymentModal: document.getElementById('paymentModal'),
-            paymentMethods: document.querySelectorAll('.payment-method'),
-            cardPaymentForm: document.getElementById('cardPaymentForm'),
-            bankPaymentForm: document.getElementById('bankPaymentForm'),
-            cardNumber: document.getElementById('cardNumber'),
-            cardExpiry: document.getElementById('cardExpiry'),
-            cardCvv: document.getElementById('cardCvv'),
-            cardHolder: document.getElementById('cardHolder'),
-            bankAmount: document.getElementById('bankAmount'),
-            bankReference: document.getElementById('bankReference'),
-            confirmPayment: document.getElementById('confirmPayment'),
-            cancelPayment: document.getElementById('cancelPayment'),
-            
-            // Invoice modal elements
-            invoiceModal: document.getElementById('invoiceModal'),
-            invoiceNumber: document.getElementById('invoiceNumber'),
-            invoiceDate: document.getElementById('invoiceDate'),
-            invoiceItems: document.getElementById('invoiceItems'),
-            invoiceSubtotal: document.getElementById('invoiceSubtotal'),
-            invoiceTax: document.getElementById('invoiceTax'),
-            invoiceTotal: document.getElementById('invoiceTotal'),
-            printInvoice: document.getElementById('printInvoice'),
-            closeInvoice: document.getElementById('closeInvoice'),
-            
-            // Admin modals
-            adminProductModal: document.getElementById('adminProductModal'),
-            productModalTitle: document.getElementById('productModalTitle'),
-            productForm: document.getElementById('productForm'),
-            productName: document.getElementById('productName'),
-            productPrice: document.getElementById('productPrice'),
-            productImage: document.getElementById('productImage'),
-            productCategory: document.getElementById('productCategory'),
-            productDescription: document.getElementById('productDescription'),
-            productQuantity: document.getElementById('productQuantity'),
-            cancelProductModal: document.getElementById('cancelProductModal'),
-            
-            adminOfferModal: document.getElementById('adminOfferModal'),
-            offerModalTitle: document.getElementById('offerModalTitle'),
-            offerForm: document.getElementById('offerForm'),
-            offerProduct: document.getElementById('offerProduct'),
-            offerDiscount: document.getElementById('offerDiscount'),
-            offerStartDate: document.getElementById('offerStartDate'),
-            offerEndDate: document.getElementById('offerEndDate'),
-            cancelOfferModal: document.getElementById('cancelOfferModal'),
-            
-            // Product details modal
-            productDetailsModal: document.getElementById('productDetailsModal'),
-            productDetailsTitle: document.getElementById('productDetailsTitle'),
-            productDetailsImage: document.getElementById('productDetailsImage'),
-            productDetailsName: document.getElementById('productDetailsName'),
-            productDetailsDescription: document.getElementById('productDetailsDescription'),
-            productDetailsPrice: document.getElementById('productDetailsPrice'),
-            productDetailsOriginalPrice: document.getElementById('productDetailsOriginalPrice'),
-            productDetailsRating: document.getElementById('productDetailsRating'),
-            decreaseQuantity: document.getElementById('decreaseQuantity'),
-            increaseQuantity: document.getElementById('increaseQuantity'),
-            productQuantityInput: document.getElementById('productQuantityInput'),
-            addToCartFromDetails: document.getElementById('addToCartFromDetails'),
-            toggleFavoriteFromDetails: document.getElementById('toggleFavoriteFromDetails'),
-            closeProductDetails: document.getElementById('closeProductDetails'),
-            
-            // Reset button
-            resetSystemBtn: document.getElementById('resetSystemBtn'),
-            loadingScreen: document.getElementById('loadingScreen')
-        };
-
-        // تهيئة Firebase مع معالجة أفضل للأخطاء
-        const firebaseConfig = {
-          apiKey: "AIzaSyCsHb_ul0DsA2FjZWs-CIfsuRGVW6-C628",
-          authDomain: "falconstore-e985f.firebaseapp.com",
-          projectId: "falconstore-e985f",
-          storageBucket: "falconstore-e985f.firebasestorage.app",
-          messagingSenderId: "1043990877048",
-          appId: "1:1043990877048:web:74d861d58ded43dc822e8d",
-          measurementId: "G-4GQKL3NPK2"
-        };
-
-        // Initialize Firebase مع معالجة الأخطاء
-        let db;
-        let firebaseInitialized = false;
-
-        try {
-          if (typeof firebase !== 'undefined') {
-            if (firebase.apps.length === 0) {
-              firebase.initializeApp(firebaseConfig);
+        // عرض بريد المستخدم الحالي
+        document.addEventListener('DOMContentLoaded', function() {
+            const userEmail = localStorage.getItem('userEmail');
+            if (userEmail) {
+                document.getElementById('userEmailDisplay').textContent = userEmail;
             }
-            db = firebase.firestore();
-            firebaseInitialized = true;
-            console.log('تم تهيئة Firebase بنجاح');
-          } else {
-            console.log('Firebase غير متوفر، استخدام وضع عدم الاتصال');
-          }
-        } catch (error) {
-          console.error('خطأ في تهيئة Firebase:', error);
-          firebaseInitialized = false;
-        }
-
-        // نظام قاعدة البيانات الهجين مع الأولوية لـ localStorage
-        const Database = {
-            // حفظ البيانات في كلا المصدرين
-            setItem: async function(key, data) {
-                try {
-                    // حفظ في localStorage أولاً (لضمان السرعة والموثوقية)
-                    localStorage.setItem(key, JSON.stringify(data));
-                    
-                    // محاولة حفظ في Firebase إذا كان متاحاً
-                    if (firebaseInitialized && db) {
-                        try {
-                            await db.collection('storeData').doc(key).set({
-                                data: data,
-                                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                                lastModified: new Date().toISOString()
-                            });
-                            console.log(`تم حفظ ${key} في Firebase`);
-                        } catch (firebaseError) {
-                            console.warn(`فشل حفظ ${key} في Firebase:`, firebaseError);
-                        }
-                    }
-                    return true;
-                } catch (error) {
-                    console.error(`خطأ في حفظ ${key}:`, error);
-                    return false;
-                }
-            },
             
-            // جلب البيانات مع الأولوية لـ localStorage
-            getItem: async function(key) {
-                try {
-                    // الأولوية للبيانات المحلية (أسرع وأكثر موثوقية)
-                    const localData = localStorage.getItem(key);
-                    if (localData) {
-                        console.log(`تم جلب ${key} من localStorage`);
-                        return JSON.parse(localData);
-                    }
-                    
-                    // إذا لم توجد بيانات محلية، جرب Firebase
-                    if (firebaseInitialized && db) {
-                        try {
-                            const doc = await db.collection('storeData').doc(key).get();
-                            if (doc.exists) {
-                                const firebaseData = doc.data().data;
-                                console.log(`تم جلب ${key} من Firebase`);
-                                // حفظ نسخة محلية للمرة القادمة
-                                localStorage.setItem(key, JSON.stringify(firebaseData));
-                                return firebaseData;
-                            }
-                        } catch (firebaseError) {
-                            console.warn(`فشل جلب ${key} من Firebase:`, firebaseError);
-                        }
-                    }
-                    
-                    return null;
-                } catch (error) {
-                    console.error(`خطأ في جلب ${key}:`, error);
-                    return null;
-                }
-            },
-            
-            // الاستماع للتحديثات الفورية
-            listenToChanges: function(callback) {
-                if (!firebaseInitialized || !db) {
-                    console.log('Firebase غير متوفر للاستماع للتحديثات');
-                    return;
-                }
-                
-                db.collection('storeData').onSnapshot((snapshot) => {
-                    snapshot.docChanges().forEach((change) => {
-                        if (change.type === "modified" || change.type === "added") {
-                            console.log(`تم تحديث ${change.doc.id} في Firebase`);
-                            // تحديث localStorage أيضاً
-                            localStorage.setItem(change.doc.id, JSON.stringify(change.doc.data().data));
-                            callback(change.doc.id, change.doc.data().data);
-                        }
-                    });
-                }, (error) => {
-                    console.error('خطأ في الاستماع للتحديثات:', error);
-                });
-            },
-            
-            // حذف البيانات
-            removeItem: async function(key) {
-                try {
-                    localStorage.removeItem(key);
-                    if (firebaseInitialized && db) {
-                        await db.collection('storeData').doc(key).delete();
-                    }
-                    return true;
-                } catch (error) {
-                    console.error(`خطأ في حذف ${key}:`, error);
-                    return false;
-                }
-            },
-            
-            // مسح جميع البيانات
-            clear: async function() {
-                try {
-                    localStorage.clear();
-                    if (firebaseInitialized && db) {
-                        const snapshot = await db.collection('storeData').get();
-                        const batch = db.batch();
-                        snapshot.docs.forEach((doc) => {
-                            batch.delete(doc.ref);
-                        });
-                        await batch.commit();
-                    }
-                    return true;
-                } catch (error) {
-                    console.error('خطأ في مسح البيانات:', error);
-                    return false;
-                }
-            }
-        };
-
-        // إعادة تعيين النظام
-        async function resetSystem() {
-            if (confirm('هل تريد إعادة تعيين النظام؟ سيتم حذف جميع البيانات.')) {
-                await Database.clear();
-                await initializeDefaultData();
-                showNotification('تم إعادة تعيين النظام بنجاح', 'success');
-                setTimeout(() => {
-                    location.reload();
-                }, 1500);
-            }
-        }
-
-        // تهيئة البيانات الافتراضية
-        async function initializeDefaultData() {
-            console.log('جاري تهيئة البيانات الافتراضية...');
-            
-            // بيانات المستخدمين الافتراضية - تأكد من حفظها
-            const defaultUsers = [
-                {
-                    id: '1',
-                    username: 'admin',
-                    password: 'admin123',
-                    email: 'admin@store.com',
-                    role: 'admin'
-                },
-                {
-                    id: '2', 
-                    username: 'user',
-                    password: 'user123',
-                    email: 'user@store.com',
-                    role: 'user'
-                }
-            ];
-            
-            // بيانات الفئات الافتراضية
-            const defaultCategories = [
-                { id: '1', name: 'إلكترونيات' },
-                { id: '2', name: 'ملابس' },
-                { id: '3', name: 'أحذية' },
-                { id: '4', name: 'أجهزة منزلية' }
-            ];
-            
-            // بيانات المنتجات الافتراضية
-            const defaultProducts = [
-                {
-                    id: '1',
-                    name: 'هاتف ذكي',
-                    price: 299,
-                    image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400',
-                    category: '1',
-                    description: 'هاتف ذكي بمواصفات عالية وكاميرا متميزة، بشاشة كبيرة وذاكرة تخزين واسعة',
-                    quantity: 50
-                },
-                {
-                    id: '2',
-                    name: 'قميص رجالي',
-                    price: 49,
-                    image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400',
-                    category: '2',
-                    description: 'قميص أنيق ومريح مصنوع من القطن عالي الجودة، مناسب للمناسبات الرسمية واليومية',
-                    quantity: 100
-                },
-                {
-                    id: '3',
-                    name: 'حذاء رياضي',
-                    price: 89,
-                    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400',
-                    category: '3',
-                    description: 'حذاء رياضي مريح وعصري، مناسب للرياضة والاستخدام اليومي',
-                    quantity: 75
-                },
-                {
-                    id: '4',
-                    name: 'لابتوب',
-                    price: 599,
-                    image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400',
-                    category: '1',
-                    description: 'لابتوب قوي بمعالج حديث وشاشة عالية الدقة، مثالي للعمل والترفيه',
-                    quantity: 25
-                }
-            ];
-
-            try {
-                // حفظ البيانات في localStorage أولاً (كمصدر أساسي)
-                localStorage.setItem('users', JSON.stringify(defaultUsers));
-                localStorage.setItem('categories', JSON.stringify(defaultCategories));
-                localStorage.setItem('products', JSON.stringify(defaultProducts));
-                localStorage.setItem('offers', JSON.stringify([]));
-                localStorage.setItem('ratings', JSON.stringify([]));
-                localStorage.setItem('favorites', JSON.stringify([]));
-                localStorage.setItem('orders', JSON.stringify([]));
-                localStorage.setItem('cart', JSON.stringify([]));
-                
-                console.log('تم حفظ البيانات في localStorage');
-                
-                // محاولة حفظ في Firebase إذا كان متاحاً
-                if (firebaseInitialized) {
-                    try {
-                        await Database.setItem('users', defaultUsers);
-                        await Database.setItem('categories', defaultCategories);
-                        await Database.setItem('products', defaultProducts);
-                        await Database.setItem('offers', []);
-                        await Database.setItem('ratings', []);
-                        await Database.setItem('favorites', []);
-                        await Database.setItem('orders', []);
-                        await Database.setItem('cart', []);
-                        console.log('تم حفظ البيانات في Firebase أيضاً');
-                    } catch (firebaseError) {
-                        console.log('تم حفظ البيانات في localStorage فقط، Firebase فشل:', firebaseError);
-                    }
-                }
-                
-                return true;
-            } catch (error) {
-                console.error('خطأ في حفظ البيانات الافتراضية:', error);
-                return false;
-            }
-        }
-
-        // تحميل البيانات من localStorage
-        async function loadFromLocalStorage() {
-            try {
-                users = JSON.parse(localStorage.getItem('users') || '[]');
-                categories = JSON.parse(localStorage.getItem('categories') || '[]');
-                products = JSON.parse(localStorage.getItem('products') || '[]');
-                offers = JSON.parse(localStorage.getItem('offers') || '[]');
-                ratings = JSON.parse(localStorage.getItem('ratings') || '[]');
-                favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-                orders = JSON.parse(localStorage.getItem('orders') || '[]');
-                cart = JSON.parse(localStorage.getItem('cart') || '[]');
-                
-                const currentUserData = localStorage.getItem('currentUser');
-                currentUser = currentUserData ? JSON.parse(currentUserData) : null;
-                
-                console.log('تم تحميل البيانات من localStorage');
-            } catch (error) {
-                console.error('خطأ في تحميل البيانات من localStorage:', error);
-                // تهيئة بيانات افتراضية
-                await initializeDefaultData();
-            }
-        }
-
-        // تحميل البيانات
-        // تحميل البيانات مع الأولوية لـ Firebase
-async function loadData() {
-    try {
-        console.log('جاري تحميل البيانات...');
-        
-        // محاولة تحميل البيانات من Firebase أولاً
-        let firebaseLoaded = false;
-        
-        if (firebaseInitialized) {
-            try {
-                console.log('محاولة تحميل البيانات من Firebase...');
-                
-                // تحميل جميع البيانات من Firebase
-                const [
-                    usersData, 
-                    categoriesData, 
-                    productsData, 
-                    offersData, 
-                    ratingsData, 
-                    favoritesData, 
-                    ordersData, 
-                    cartData
-                ] = await Promise.all([
-                    Database.getItem('users'),
-                    Database.getItem('categories'),
-                    Database.getItem('products'),
-                    Database.getItem('offers'),
-                    Database.getItem('ratings'),
-                    Database.getItem('favorites'),
-                    Database.getItem('orders'),
-                    Database.getItem('cart')
-                ]);
-                
-                // إذا تم تحميل البيانات من Firebase بنجاح
-                if (productsData && categoriesData) {
-                    users = usersData || [];
-                    categories = categoriesData || [];
-                    products = productsData || [];
-                    offers = offersData || [];
-                    ratings = ratingsData || [];
-                    favorites = favoritesData || [];
-                    orders = ordersData || [];
-                    cart = cartData || [];
-                    
-                    firebaseLoaded = true;
-                    console.log('تم تحميل البيانات من Firebase بنجاح');
-                }
-            } catch (firebaseError) {
-                console.warn('فشل تحميل البيانات من Firebase:', firebaseError);
-            }
-        }
-        
-        // إذا لم تنجح تحميل البيانات من Firebase، جرب localStorage
-        if (!firebaseLoaded) {
-            console.log('جاري تحميل البيانات من localStorage...');
-            await loadFromLocalStorage();
-            
-            // إذا لم توجد بيانات في localStorage، قم بتهيئة البيانات الافتراضية
-            if (users.length === 0 && categories.length === 0 && products.length === 0) {
-                console.log('لا توجد بيانات، جاري التهيئة...');
-                await initializeDefaultData();
-                await loadFromLocalStorage();
-            }
-        }
-        
-        // تحميل المستخدم الحالي من localStorage فقط (لأنه خاص بكل مستخدم)
-        const currentUserData = localStorage.getItem('currentUser');
-        currentUser = currentUserData ? JSON.parse(currentUserData) : null;
-        
-        console.log('تم تحميل البيانات بنجاح:', {
-            users: users.length,
-            categories: categories.length,
-            products: products.length,
-            source: firebaseLoaded ? 'Firebase' : 'localStorage'
+            // زر تسجيل الخروج
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                localStorage.removeItem('isAuthenticated');
+                localStorage.removeItem('userEmail');
+                window.location.href = 'login.html';
+            });
         });
-        
-    } catch (error) {
-        console.error('خطأ في تحميل البيانات:', error);
-        // محاولة التحميل من localStorage كحل احتياطي
-        await loadFromLocalStorage();
-    }
-}
-
-        // إعداد مستمعي الأحداث
-        function setupEventListeners() {
-            // التنقل
-            elements.homeBtn.addEventListener('click', () => setCurrentPage('home'));
-            elements.adminBtn.addEventListener('click', () => setCurrentPage('admin'));
-            elements.favoritesBtn.addEventListener('click', () => setCurrentPage('favorites'));
-            elements.ordersBtn.addEventListener('click', () => setCurrentPage('orders'));
-            elements.mobileHomeBtn.addEventListener('click', () => {
-                setCurrentPage('home');
-                elements.mobileMenu.classList.add('hidden');
-            });
-            elements.mobileAdminBtn.addEventListener('click', () => {
-                setCurrentPage('admin');
-                elements.mobileMenu.classList.add('hidden');
-            });
-            elements.mobileFavoritesBtn.addEventListener('click', () => {
-                setCurrentPage('favorites');
-                elements.mobileMenu.classList.add('hidden');
-            });
-            elements.mobileOrdersBtn.addEventListener('click', () => {
-                setCurrentPage('orders');
-                elements.mobileMenu.classList.add('hidden');
-            });
-            elements.cartBtn.addEventListener('click', () => setCurrentPage('cart'));
-            elements.mobileMenuToggle.addEventListener('click', () => {
-                elements.mobileMenu.classList.toggle('hidden');
-            });
-            elements.browseProductsBtn.addEventListener('click', () => setCurrentPage('home'));
-            elements.browseProductsFromFavorites.addEventListener('click', () => setCurrentPage('home'));
-
-            // البحث
-            elements.searchInput.addEventListener('input', (e) => {
-                searchQuery = e.target.value;
-                render();
-            });
-            elements.mobileSearchInput.addEventListener('input', (e) => {
-                searchQuery = e.target.value;
-                render();
-            });
-            
-            // الفلاتر
-            elements.priceFilter.addEventListener('change', (e) => {
-                selectedPriceFilter = e.target.value;
-                render();
-            });
-            
-            elements.sortProducts.addEventListener('change', (e) => {
-                sortOption = e.target.value;
-                render();
-            });
-
-            // إجراءات المستخدم
-            elements.loginBtn.addEventListener('click', () => showAuthModal());
-            elements.logoutBtn.addEventListener('click', handleLogout);
-            elements.toggleAuthMode.addEventListener('click', toggleAuthMode);
-            elements.cancelAuth.addEventListener('click', () => {
-                elements.authModal.classList.add('hidden');
-                clearAuthErrors();
-            });
-
-            elements.authForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                handleAuth(e);
-            });
-
-            // إجراءات الدفع
-            elements.paymentMethods.forEach(method => {
-                method.addEventListener('click', () => {
-                    // إزالة التحديد من جميع الطرق
-                    elements.paymentMethods.forEach(m => m.classList.remove('selected'));
-                    // إضافة التحديد للطريقة المختارة
-                    method.classList.add('selected');
-                    selectedPaymentMethod = method.dataset.method;
-                    
-                    // إظهار النموذج المناسب
-                    if (selectedPaymentMethod === 'card') {
-                        elements.cardPaymentForm.classList.remove('hidden');
-                        elements.bankPaymentForm.classList.add('hidden');
-                    } else if (selectedPaymentMethod === 'bank') {
-                        elements.cardPaymentForm.classList.add('hidden');
-                        elements.bankPaymentForm.classList.remove('hidden');
-                        // تحديث المبلغ
-                        const total = calculateCartTotal();
-                        elements.bankAmount.textContent = `${total.toFixed(2)} ر.س`;
-                    }
-                });
-            });
-            
-            elements.confirmPayment.addEventListener('click', handlePayment);
-            elements.cancelPayment.addEventListener('click', () => {
-                elements.paymentModal.classList.add('hidden');
-                resetPaymentForm();
-            });
-            
-            // إجراءات الفاتورة
-            elements.printInvoice.addEventListener('click', () => {
-                window.print();
-            });
-            elements.closeInvoice.addEventListener('click', () => {
-                elements.invoiceModal.classList.add('hidden');
-                setCurrentPage('home');
-            });
-
-            // إجراءات الإدارة
-            elements.addProductBtn.addEventListener('click', () => showProductModal());
-            elements.addCategoryForm.addEventListener('submit', addCategory);
-            elements.productForm.addEventListener('submit', handleProductSubmit);
-            elements.cancelProductModal.addEventListener('click', () => {
-                elements.adminProductModal.classList.add('hidden');
-                resetProductForm();
-            });
-            
-            elements.addOfferBtn.addEventListener('click', () => showOfferModal());
-            elements.offerForm.addEventListener('submit', handleOfferSubmit);
-            elements.cancelOfferModal.addEventListener('click', () => {
-                elements.adminOfferModal.classList.add('hidden');
-                resetOfferForm();
-            });
-
-            // إجراءات السلة
-            elements.checkoutBtn.addEventListener('click', () => {
-                if (!currentUser) {
-                    showNotification('يجب تسجيل الدخول أولاً للشراء', 'error');
-                    showAuthModal();
-                    return;
-                }
-                showPaymentModal();
-            });
-
-            // إجراءات تفاصيل المنتج
-            elements.decreaseQuantity.addEventListener('click', () => {
-                const currentValue = parseInt(elements.productQuantityInput.value);
-                if (currentValue > 1) {
-                    elements.productQuantityInput.value = currentValue - 1;
-                }
-            });
-
-            elements.increaseQuantity.addEventListener('click', () => {
-                const currentValue = parseInt(elements.productQuantityInput.value);
-                if (currentValue < 100) {
-                    elements.productQuantityInput.value = currentValue + 1;
-                }
-            });
-
-            elements.productQuantityInput.addEventListener('change', () => {
-                let value = parseInt(elements.productQuantityInput.value);
-                if (isNaN(value) || value < 1) value = 1;
-                if (value > 100) value = 100;
-                elements.productQuantityInput.value = value;
-            });
-
-            elements.addToCartFromDetails.addEventListener('click', () => {
-                if (currentProductDetails) {
-                    const quantity = parseInt(elements.productQuantityInput.value);
-                    addToCartWithQuantity(currentProductDetails, quantity);
-                    elements.productDetailsModal.classList.add('hidden');
-                }
-            });
-
-            elements.toggleFavoriteFromDetails.addEventListener('click', () => {
-                if (currentProductDetails) {
-                    toggleFavorite(currentProductDetails.id);
-                    updateFavoriteButton();
-                }
-            });
-
-            elements.closeProductDetails.addEventListener('click', () => {
-                elements.productDetailsModal.classList.add('hidden');
-            });
-
-            // زر إعادة التعيين
-            elements.resetSystemBtn.addEventListener('click', resetSystem);
-        }
-
-        // إعداد الاستماع للتحديثات الفورية
-        function setupRealtimeUpdates() {
-            Database.listenToChanges((key, newData) => {
-                console.log(`تم تحديث ${key} من مستخدم آخر`);
-                
-                // تحديث البيانات المحلية
-                switch(key) {
-                    case 'products':
-                        products = newData;
-                        break;
-                    case 'categories':
-                        categories = newData;
-                        break;
-                    case 'offers':
-                        offers = newData;
-                        break;
-                    case 'users':
-                        users = newData;
-                        break;
-                    case 'orders':
-                        orders = newData;
-                        break;
-                    case 'favorites':
-                        favorites = newData;
-                        break;
-                    case 'ratings':
-                        ratings = newData;
-                        break;
-                    case 'cart':
-                        // لا نحدث السلة لأنها خاصة بكل مستخدم
-                        break;
-                }
-                
-                // إعادة عرض الصفحة الحالية
-                render();
-                
-                // إشعار المستخدم بالتحديث
-                if (key !== 'cart') {
-                    showNotification('تم تحديث البيانات من قبل مستخدم آخر', 'info');
-                }
-            });
-        }
-
-        // تعيين الصفحة الحالية
-        function setCurrentPage(page) {
-            currentPage = page;
-            render();
-        }
-
-        // إظهار نافذة المصادقة
-        function showAuthModal() {
-            isLogin = true;
-            updateAuthModal();
-            elements.authModal.classList.remove('hidden');
-        }
-
-        // تبديل وضع المصادقة (تسجيل دخول/تسجيل)
-        function toggleAuthMode() {
-            isLogin = !isLogin;
-            updateAuthModal();
-        }
-
-        // تحديث نافذة المصادقة بناءً على الوضع
-        function updateAuthModal() {
-            if (isLogin) {
-                elements.authTitle.textContent = 'تسجيل الدخول';
-                elements.toggleAuthMode.textContent = 'ليس لديك حساب؟ سجل الآن';
-                elements.emailField.classList.add('hidden');
-                elements.emailInput.required = false;
-                elements.authForm.querySelector('button[type="submit"]').textContent = 'دخول';
-            } else {
-                elements.authTitle.textContent = 'إنشاء حساب جديد';
-                elements.toggleAuthMode.textContent = 'لديك حساب؟ سجل دخول';
-                elements.emailField.classList.remove('hidden');
-                elements.emailInput.required = true;
-                elements.authForm.querySelector('button[type="submit"]').textContent = 'تسجيل';
-            }
-            
-            // إعادة تعيين النموذج والأخطاء
-            clearAuthErrors();
-            elements.usernameInput.value = '';
-            elements.emailInput.value = '';
-            elements.passwordInput.value = '';
-        }
-
-        // مسح رسائل الخطأ
-        function clearAuthErrors() {
-            elements.usernameError.classList.add('hidden');
-            elements.emailError.classList.add('hidden');
-            elements.passwordError.classList.add('hidden');
-            
-            elements.usernameInput.classList.remove('input-error');
-            elements.emailInput.classList.remove('input-error');
-            elements.passwordInput.classList.remove('input-error');
-        }
-
-        // إظهار خطأ في المصادقة
-        function showAuthError(field, message) {
-            const errorElement = elements[`${field}Error`];
-            const inputElement = elements[`${field}Input`];
-            
-            errorElement.querySelector('span').textContent = message;
-            errorElement.classList.remove('hidden');
-            inputElement.classList.add('input-error');
-        }
-
-        // معالجة المصادقة
-        async function handleAuth(e) {
-            e.preventDefault();
-            
-            const username = elements.usernameInput.value.trim();
-            const password = elements.passwordInput.value;
-            const email = elements.emailInput.value.trim();
-            
-            // مسح الأخطاء السابقة
-            clearAuthErrors();
-            
-            if (isLogin) {
-                // منطق تسجيل الدخول
-                const user = users.find(u => u.username === username && u.password === password);
-                
-                if (user) {
-                    currentUser = user;
-                    await saveData();
-                    elements.authModal.classList.add('hidden');
-                    showNotification('تم تسجيل الدخول بنجاح', 'success');
-                    render();
-                } else {
-                    showAuthError('username', 'اسم المستخدم أو كلمة المرور غير صحيحة');
-                    showAuthError('password', 'اسم المستخدم أو كلمة المرور غير صحيحة');
-                }
-            } else {
-                // منطق التسجيل
-                let hasError = false;
-                
-                if (users.some(u => u.username === username)) {
-                    showAuthError('username', 'اسم المستخدم موجود مسبقاً');
-                    hasError = true;
-                }
-                
-                if (users.some(u => u.email === email)) {
-                    showAuthError('email', 'البريد الإلكتروني موجود مسبقاً');
-                    hasError = true;
-                }
-                
-                if (password.length < 6) {
-                    showAuthError('password', 'كلمة المرور يجب أن تكون 6 أحرف على الأقل');
-                    hasError = true;
-                }
-                
-                if (hasError) return;
-                
-                const newUser = {
-                    id: Date.now().toString(),
-                    username: username,
-                    password: password,
-                    email: email,
-                    role: 'user'
-                };
-                
-                users.push(newUser);
-                await saveData();
-                currentUser = newUser;
-                await saveData();
-                elements.authModal.classList.add('hidden');
-                showNotification('تم إنشاء الحساب بنجاح', 'success');
-                render();
-            }
-        }
-
-        // معالجة تسجيل الخروج
-        async function handleLogout() {
-            currentUser = null;
-            await saveData();
-            cart = [];
-            await saveData();
-            setCurrentPage('home');
-            showNotification('تم تسجيل الخروج بنجاح', 'info');
-            render();
-        }
-
-        // إضافة إلى السلة بكمية
-        async function addToCartWithQuantity(product, quantity = 1) {
-            if (!currentUser) {
-                showNotification('يجب تسجيل الدخول أولاً للشراء', 'error');
-                showAuthModal();
-                return;
-            }
-            
-            // التحقق من توفر الكمية
-            if (product.quantity < quantity) {
-                showNotification(`الكمية المطلوبة غير متوفرة. المتاح: ${product.quantity}`, 'error');
-                return;
-            }
-            
-            const existingItem = cart.find(item => item.id === product.id);
-            if (existingItem) {
-                // التحقق من عدم تجاوز الكمية المتاحة
-                if (existingItem.quantity + quantity > product.quantity) {
-                    showNotification(`لا يمكن إضافة هذه الكمية. المتاح: ${product.quantity - existingItem.quantity}`, 'error');
-                    return;
-                }
-                existingItem.quantity += quantity;
-            } else {
-                cart.push({ ...product, quantity: quantity });
-            }
-            
-            await saveData();
-            showNotification('تم إضافة المنتج إلى السلة', 'success');
-            render();
-        }
-
-        // إضافة إلى السلة (كمية افتراضية 1)
-        function addToCart(product) {
-            addToCartWithQuantity(product, 1);
-        }
-
-        // إزالة من السلة
-        async function removeFromCart(productId) {
-            cart = cart.filter(item => item.id !== productId);
-            await saveData();
-            showNotification('تم إزالة المنتج من السلة', 'info');
-            render();
-        }
-
-        // تحديث كمية السلة
-        async function updateCartQuantity(productId, quantity) {
-            if (quantity === 0) {
-                removeFromCart(productId);
-            } else {
-                const item = cart.find(item => item.id === productId);
-                if (item) {
-                    // التحقق من توفر كمية المنتج
-                    const product = products.find(p => p.id === productId);
-                    if (product && quantity > product.quantity) {
-                        showNotification(`الكمية المطلوبة غير متوفرة. المتاح: ${product.quantity}`, 'error');
-                        return;
-                    }
-                    
-                    item.quantity = quantity;
-                    await saveData();
-                    render();
-                }
-            }
-        }
-        
-        // حساب المجموع الكلي للسلة
-        function calculateCartTotal() {
-            return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-        }
-        
-        // إظهار نافذة الدفع
-        function showPaymentModal() {
-            elements.paymentModal.classList.remove('hidden');
-            resetPaymentForm();
-        }
-        
-        // إعادة تعيين نموذج الدفع
-        function resetPaymentForm() {
-            selectedPaymentMethod = null;
-            elements.paymentMethods.forEach(m => m.classList.remove('selected'));
-            elements.cardPaymentForm.classList.add('hidden');
-            elements.bankPaymentForm.classList.add('hidden');
-            elements.cardNumber.value = '';
-            elements.cardExpiry.value = '';
-            elements.cardCvv.value = '';
-            elements.cardHolder.value = '';
-            elements.bankReference.value = '';
-        }
-        
-        // معالجة الدفع
-        async function handlePayment() {
-            if (!selectedPaymentMethod) {
-                showNotification('يرجى اختيار طريقة الدفع', 'error');
-                return;
-            }
-            
-            // محاكاة معالجة الدفع
-            showNotification('جاري معالجة الدفع...', 'info');
-            
-            setTimeout(async () => {
-                // إنشاء طلب
-                const order = {
-                    id: Date.now().toString(),
-                    userId: currentUser.id,
-                    items: [...cart],
-                    total: calculateCartTotal(),
-                    date: new Date().toISOString(),
-                    paymentMethod: selectedPaymentMethod,
-                    status: 'completed'
-                };
-                
-                orders.push(order);
-                await saveData();
-                
-                // تحديث كميات المنتجات
-                cart.forEach(cartItem => {
-                    const product = products.find(p => p.id === cartItem.id);
-                    if (product) {
-                        product.quantity -= cartItem.quantity;
-                    }
-                });
-                await saveData();
-                
-                // تفريغ السلة
-                cart = [];
-                await saveData();
-                
-                // إظهار الفاتورة
-                showInvoice(order);
-                
-                elements.paymentModal.classList.add('hidden');
-            }, 2000);
-        }
-        
-        // إظهار الفاتورة
-        function showInvoice(order) {
-            elements.invoiceNumber.textContent = `#${order.id}`;
-            elements.invoiceDate.textContent = new Date(order.date).toLocaleDateString('ar-KW');
-            
-            // حساب المجاميع
-            const subtotal = order.total;
-            const tax = subtotal * 0.05; // ضريبة 5%
-            const total = subtotal + tax;
-            
-            // عرض عناصر الفاتورة
-            elements.invoiceItems.innerHTML = '';
-            order.items.forEach(item => {
-                const itemElement = document.createElement('div');
-                itemElement.className = 'invoice-item flex justify-between';
-                itemElement.innerHTML = `
-                    <div>
-                        <p class="font-medium">${item.name}</p>
-                        <p class="text-slate-500 text-sm">${item.quantity} × ${item.price} ر.س</p>
-                    </div>
-                    <p class="font-medium">${(item.price * item.quantity).toFixed(2)} ر.س</p>
-                `;
-                elements.invoiceItems.appendChild(itemElement);
-            });
-            
-            // تحديث المجاميع
-            elements.invoiceSubtotal.textContent = `${subtotal.toFixed(2)} ر.س`;
-            elements.invoiceTax.textContent = `${tax.toFixed(2)} ر.س`;
-            elements.invoiceTotal.textContent = `${total.toFixed(2)} ر.س`;
-            
-            elements.invoiceModal.classList.remove('hidden');
-        }
-
-        // تبديل المفضلة
-        async function toggleFavorite(productId) {
-            if (!currentUser) {
-                showNotification('يجب تسجيل الدخول أولاً', 'error');
-                showAuthModal();
-                return;
-            }
-            
-            const index = favorites.findIndex(fav => fav.productId === productId && fav.userId === currentUser.id);
-            
-            if (index !== -1) {
-                favorites.splice(index, 1);
-                showNotification('تم إزالة المنتج من المفضلة', 'info');
-            } else {
-                favorites.push({
-                    id: Date.now().toString(),
-                    productId: productId,
-                    userId: currentUser.id
-                });
-                showNotification('تم إضافة المنتج إلى المفضلة', 'success');
-            }
-            
-            await saveData();
-            render();
-        }
-        
-        // التحقق إذا كان المنتج مفضلاً
-        function isFavorite(productId) {
-            if (!currentUser) return false;
-            return favorites.some(fav => fav.productId === productId && fav.userId === currentUser.id);
-        }
-        
-        // تحديث زر المفضلة في نافذة تفاصيل المنتج
-        function updateFavoriteButton() {
-            if (currentProductDetails) {
-                const isFav = isFavorite(currentProductDetails.id);
-                elements.toggleFavoriteFromDetails.innerHTML = isFav ? 
-                    '<i class="fas fa-heart text-xl text-red-500"></i>' : 
-                    '<i class="fas fa-heart text-xl"></i>';
-            }
-        }
-        
-        // تقييم المنتج
-        async function rateProduct(productId, rating) {
-            if (!currentUser) {
-                showNotification('يجب تسجيل الدخول أولاً', 'error');
-                showAuthModal();
-                return;
-            }
-            
-            const existingRating = ratings.find(r => r.productId === productId && r.userId === currentUser.id);
-            
-            if (existingRating) {
-                existingRating.rating = rating;
-            } else {
-                ratings.push({
-                    id: Date.now().toString(),
-                    productId: productId,
-                    userId: currentUser.id,
-                    rating: rating
-                });
-            }
-            
-            await saveData();
-            render();
-            showNotification('تم تقييم المنتج بنجاح', 'success');
-        }
-        
-        // الحصول على تقييم المنتج
-        function getProductRating(productId) {
-            const productRatings = ratings.filter(r => r.productId === productId);
-            if (productRatings.length === 0) return 0;
-            
-            const total = productRatings.reduce((sum, r) => sum + r.rating, 0);
-            return total / productRatings.length;
-        }
-        
-        // الحصول على تقييم المستخدم للمنتج
-        function getUserRating(productId) {
-            if (!currentUser) return 0;
-            const rating = ratings.find(r => r.productId === productId && r.userId === currentUser.id);
-            return rating ? rating.rating : 0;
-        }
-
-        // إظهار نافذة المنتج
-        function showProductModal(product = null) {
-            editingProduct = product;
-            
-            if (product) {
-                elements.productModalTitle.textContent = 'تعديل المنتج';
-                elements.productName.value = product.name;
-                elements.productPrice.value = product.price;
-                elements.productImage.value = product.image;
-                elements.productCategory.value = product.category;
-                elements.productDescription.value = product.description;
-                elements.productQuantity.value = product.quantity;
-                elements.productForm.querySelector('button[type="submit"]').textContent = 'تحديث';
-            } else {
-                elements.productModalTitle.textContent = 'إضافة منتج جديد';
-                resetProductForm();
-                elements.productForm.querySelector('button[type="submit"]').textContent = 'إضافة';
-            }
-            
-            // تعبئة قائمة الفئات
-            elements.productCategory.innerHTML = '<option value="">اختر الفئة</option>';
-            categories.forEach(cat => {
-                const option = document.createElement('option');
-                option.value = cat.id;
-                option.textContent = cat.name;
-                elements.productCategory.appendChild(option);
-            });
-            
-            if (product) {
-                elements.productCategory.value = product.category;
-            }
-            
-            elements.adminProductModal.classList.remove('hidden');
-        }
-
-        // إعادة تعيين نموذج المنتج
-        function resetProductForm() {
-            elements.productName.value = '';
-            elements.productPrice.value = '';
-            elements.productImage.value = '';
-            elements.productCategory.value = '';
-            elements.productDescription.value = '';
-            elements.productQuantity.value = '1';
-        }
-
-        // معالجة تقديم نموذج المنتج
-        async function handleProductSubmit(e) {
-            e.preventDefault();
-            
-            const productData = {
-                name: elements.productName.value,
-                price: parseFloat(elements.productPrice.value),
-                image: elements.productImage.value,
-                category: elements.productCategory.value,
-                description: elements.productDescription.value,
-                quantity: parseInt(elements.productQuantity.value)
-            };
-            
-            if (editingProduct) {
-                // تحديث المنتج الحالي
-                const index = products.findIndex(p => p.id === editingProduct.id);
-                if (index !== -1) {
-                    products[index] = { ...productData, id: editingProduct.id };
-                    showNotification('تم تحديث المنتج بنجاح', 'success');
-                }
-            } else {
-                // إضافة منتج جديد
-                const newProduct = {
-                    ...productData,
-                    id: Date.now().toString()
-                };
-                products.push(newProduct);
-                showNotification('تم إضافة المنتج بنجاح', 'success');
-            }
-            
-            await saveData();
-            elements.adminProductModal.classList.add('hidden');
-            editingProduct = null;
-            // الذهاب للصفحة الرئيسية بعد إضافة المنتج
-            setCurrentPage('home');
-            render();
-        }
-
-        // حذف المنتج
-        async function deleteProduct(id) {
-            if (confirm('هل تريد حذف هذا المنتج؟')) {
-                products = products.filter(p => p.id !== id);
-                await saveData();
-                showNotification('تم حذف المنتج بنجاح', 'success');
-                render();
-            }
-        }
-        
-        // إظهار نافذة العرض
-        function showOfferModal(offer = null) {
-            editingOffer = offer;
-            
-            if (offer) {
-                elements.offerModalTitle.textContent = 'تعديل العرض';
-                elements.offerProduct.value = offer.productId;
-                elements.offerDiscount.value = offer.discount;
-                elements.offerStartDate.value = offer.startDate;
-                elements.offerEndDate.value = offer.endDate;
-                elements.offerForm.querySelector('button[type="submit"]').textContent = 'تحديث';
-            } else {
-                elements.offerModalTitle.textContent = 'إضافة عرض جديد';
-                resetOfferForm();
-                elements.offerForm.querySelector('button[type="submit"]').textContent = 'إضافة';
-            }
-            
-            // تعبئة قائمة المنتجات
-            elements.offerProduct.innerHTML = '<option value="">اختر المنتج</option>';
-            products.forEach(product => {
-                const option = document.createElement('option');
-                option.value = product.id;
-                option.textContent = product.name;
-                elements.offerProduct.appendChild(option);
-            });
-            
-            if (offer) {
-                elements.offerProduct.value = offer.productId;
-            }
-            
-            // تعيين الحد الأدنى للتاريخ إلى اليوم
-            const today = new Date().toISOString().split('T')[0];
-            elements.offerStartDate.min = today;
-            elements.offerEndDate.min = today;
-            
-            elements.adminOfferModal.classList.remove('hidden');
-        }
-        
-        // إعادة تعيين نموذج العرض
-        function resetOfferForm() {
-            elements.offerProduct.value = '';
-            elements.offerDiscount.value = '';
-            elements.offerStartDate.value = '';
-            elements.offerEndDate.value = '';
-        }
-        
-        // معالجة تقديم نموذج العرض
-        async function handleOfferSubmit(e) {
-            e.preventDefault();
-            
-            const offerData = {
-                productId: elements.offerProduct.value,
-                discount: parseInt(elements.offerDiscount.value),
-                startDate: elements.offerStartDate.value,
-                endDate: elements.offerEndDate.value
-            };
-            
-            // التحقق من التواريخ
-            if (new Date(offerData.endDate) <= new Date(offerData.startDate)) {
-                showNotification('تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء', 'error');
-                return;
-            }
-            
-            if (editingOffer) {
-                // تحديث العرض الحالي
-                const index = offers.findIndex(o => o.id === editingOffer.id);
-                if (index !== -1) {
-                    offers[index] = { ...offerData, id: editingOffer.id };
-                    showNotification('تم تحديث العرض بنجاح', 'success');
-                }
-            } else {
-                // إضافة عرض جديد
-                const newOffer = {
-                    ...offerData,
-                    id: Date.now().toString()
-                };
-                offers.push(newOffer);
-                showNotification('تم إضافة العرض بنجاح', 'success');
-            }
-            
-            await saveData();
-            elements.adminOfferModal.classList.add('hidden');
-            editingOffer = null;
-            render();
-        }
-        
-        // حذف العرض
-        async function deleteOffer(id) {
-            if (confirm('هل تريد حذف هذا العرض؟')) {
-                offers = offers.filter(o => o.id !== id);
-                await saveData();
-                showNotification('تم حذف العرض بنجاح', 'success');
-                render();
-            }
-        }
-        
-        // التحقق إذا كان للمنتج عرض نشط
-        function getProductOffer(productId) {
-            const today = new Date().toISOString().split('T')[0];
-            return offers.find(offer => 
-                offer.productId === productId && 
-                offer.startDate <= today && 
-                offer.endDate >= today
-            );
-        }
-        
-        // حساب السعر بعد الخصم
-        function getDiscountedPrice(price, discount) {
-            return price - (price * discount / 100);
-        }
-
-        // إضافة فئة
-        async function addCategory(e) {
-            e.preventDefault();
-            
-            const name = elements.categoryName.value.trim();
-            if (name) {
-                const newCategory = {
-                    id: Date.now().toString(),
-                    name: name
-                };
-                categories.push(newCategory);
-                await saveData();
-                elements.categoryName.value = '';
-                showNotification('تم إضافة الفئة بنجاح', 'success');
-                render();
-            }
-        }
-
-        // حذف فئة
-        async function deleteCategory(id) {
-            if (confirm('هل تريد حذف هذه الفئة؟')) {
-                categories = categories.filter(c => c.id !== id);
-                await saveData();
-                showNotification('تم حذف الفئة بنجاح', 'success');
-                render();
-            }
-        }
-        
-        // إظهار تفاصيل المنتج
-        function showProductDetails(product) {
-            currentProductDetails = product;
-            const offer = getProductOffer(product.id);
-            const finalPrice = offer ? getDiscountedPrice(product.price, offer.discount) : product.price;
-            const rating = getProductRating(product.id);
-            
-            elements.productDetailsTitle.textContent = 'تفاصيل المنتج';
-            elements.productDetailsImage.src = product.image;
-            elements.productDetailsImage.alt = product.name;
-            elements.productDetailsName.textContent = product.name;
-            elements.productDetailsDescription.textContent = product.description;
-            elements.productDetailsPrice.textContent = `${finalPrice.toFixed(2)} ر.س`;
-            elements.productDetailsRating.textContent = `(${rating.toFixed(1)})`;
-            
-            if (offer) {
-                elements.productDetailsOriginalPrice.textContent = `${product.price} ر.س`;
-                elements.productDetailsOriginalPrice.classList.remove('hidden');
-            } else {
-                elements.productDetailsOriginalPrice.classList.add('hidden');
-            }
-            
-            // إعادة تعيين الكمية
-            elements.productQuantityInput.value = '1';
-            
-            // تحديث زر المفضلة
-            updateFavoriteButton();
-            
-            elements.productDetailsModal.classList.remove('hidden');
-        }
-        
-        // إظهار الإشعار
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
-            
-            elements.notificationContainer.appendChild(notification);
-            
-            // إظهار الإشعار
-            setTimeout(() => {
-                notification.classList.add('show');
-            }, 100);
-            
-            // إخفاء وإزالة الإشعار بعد 3 ثواني
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 300);
-            }, 3000);
-        }
-
-        // عرض التطبيق
-        function render() {
-            // تحديث التنقل بناءً على الصفحة الحالية
-            updateNavigation();
-            
-            // تحديث قسم المستخدم
-            updateUserSection();
-            
-            // عرض الصفحة الحالية
-            renderHomePage();
-            renderFavoritesPage();
-            renderOrdersPage();
-            renderCartPage();
-            renderAdminPage();
-            
-            // تحديث عداد السلة
-            updateCartCount();
-        }
-
-        // تحديث التنقل
-        function updateNavigation() {
-            // إخفاء جميع الصفحات
-            elements.homePage.classList.add('hidden');
-            elements.favoritesPage.classList.add('hidden');
-            elements.ordersPage.classList.add('hidden');
-            elements.cartPage.classList.add('hidden');
-            elements.adminPage.classList.add('hidden');
-            
-            // إظهار الصفحة الحالية
-            if (currentPage === 'home') {
-                elements.homePage.classList.remove('hidden');
-                elements.homeBtn.classList.add('bg-blue-600', 'text-white', 'shadow-lg');
-                elements.homeBtn.classList.remove('text-slate-700', 'hover:bg-slate-100');
-                elements.mobileHomeBtn.classList.add('bg-blue-600', 'text-white');
-                elements.mobileHomeBtn.classList.remove('text-slate-700', 'hover:bg-slate-100');
-                
-                // إعادة تعيين الأزرار الأخرى
-                elements.favoritesBtn.classList.remove('bg-purple-600', 'text-white', 'shadow-lg');
-                elements.favoritesBtn.classList.add('text-slate-700', 'hover:bg-slate-100');
-                elements.mobileFavoritesBtn.classList.remove('bg-purple-600', 'text-white');
-                elements.mobileFavoritesBtn.classList.add('text-slate-700', 'hover:bg-slate-100');
-                
-                elements.ordersBtn.classList.remove('bg-purple-600', 'text-white', 'shadow-lg');
-                elements.ordersBtn.classList.add('text-slate-700', 'hover:bg-slate-100');
-                elements.mobileOrdersBtn.classList.remove('bg-purple-600', 'text-white');
-                elements.mobileOrdersBtn.classList.add('text-slate-700', 'hover:bg-slate-100');
-            } 
-            else if (currentPage === 'favorites') {
-                elements.favoritesPage.classList.remove('hidden');
-                elements.favoritesBtn.classList.add('bg-purple-600', 'text-white', 'shadow-lg');
-                elements.favoritesBtn.classList.remove('text-slate-700', 'hover:bg-slate-100');
-                elements.mobileFavoritesBtn.classList.add('bg-purple-600', 'text-white');
-                elements.mobileFavoritesBtn.classList.remove('text-slate-700', 'hover:bg-slate-100');
-                
-                // إعادة تعيين الأزرار الأخرى
-                elements.homeBtn.classList.remove('bg-blue-600', 'text-white', 'shadow-lg');
-                elements.homeBtn.classList.add('text-slate-700', 'hover:bg-slate-100');
-                elements.mobileHomeBtn.classList.remove('bg-blue-600', 'text-white');
-                elements.mobileHomeBtn.classList.add('text-slate-700', 'hover:bg-slate-100');
-            }
-            else if (currentPage === 'orders') {
-                elements.ordersPage.classList.remove('hidden');
-                elements.ordersBtn.classList.add('bg-purple-600', 'text-white', 'shadow-lg');
-                elements.ordersBtn.classList.remove('text-slate-700', 'hover:bg-slate-100');
-                elements.mobileOrdersBtn.classList.add('bg-purple-600', 'text-white');
-                elements.mobileOrdersBtn.classList.remove('text-slate-700', 'hover:bg-slate-100');
-                
-                // إعادة تعيين الأزرار الأخرى
-                elements.homeBtn.classList.remove('bg-blue-600', 'text-white', 'shadow-lg');
-                elements.homeBtn.classList.add('text-slate-700', 'hover:bg-slate-100');
-                elements.mobileHomeBtn.classList.remove('bg-blue-600', 'text-white');
-                elements.mobileHomeBtn.classList.add('text-slate-700', 'hover:bg-slate-100');
-            }
-            else if (currentPage === 'cart') {
-                elements.cartPage.classList.remove('hidden');
-            }
-            else if (currentPage === 'admin') {
-                elements.adminPage.classList.remove('hidden');
-                elements.adminBtn.classList.add('bg-purple-600', 'text-white', 'shadow-lg');
-                elements.adminBtn.classList.remove('text-slate-700', 'hover:bg-slate-100');
-                elements.mobileAdminBtn.classList.add('bg-purple-600', 'text-white');
-                elements.mobileAdminBtn.classList.remove('text-slate-700', 'hover:bg-slate-100');
-            } else {
-                elements.adminBtn.classList.remove('bg-purple-600', 'text-white', 'shadow-lg');
-                elements.adminBtn.classList.add('text-slate-700', 'hover:bg-slate-100');
-                elements.mobileAdminBtn.classList.remove('bg-purple-600', 'text-white');
-                elements.mobileAdminBtn.classList.add('text-slate-700', 'hover:bg-slate-100');
-            }
-            
-            // إظهار/إخفاء أزرار الإدارة والطلبات بناءً على دور المستخدم وحالة تسجيل الدخول
-            if (currentUser) {
-                elements.ordersBtn.classList.remove('hidden');
-                elements.mobileOrdersBtn.classList.remove('hidden');
-                
-                if (currentUser.role === 'admin') {
-                    elements.adminBtn.classList.remove('hidden');
-                    elements.mobileAdminBtn.classList.remove('hidden');
-                } else {
-                    elements.adminBtn.classList.add('hidden');
-                    elements.mobileAdminBtn.classList.add('hidden');
-                }
-            } else {
-                elements.ordersBtn.classList.add('hidden');
-                elements.mobileOrdersBtn.classList.add('hidden');
-                elements.adminBtn.classList.add('hidden');
-                elements.mobileAdminBtn.classList.add('hidden');
-            }
-        }
-
-        // تحديث قسم المستخدم
-        function updateUserSection() {
-            if (currentUser) {
-                elements.userSection.classList.remove('hidden');
-                elements.loginSection.classList.add('hidden');
-                elements.username.textContent = currentUser.username;
-            } else {
-                elements.userSection.classList.add('hidden');
-                elements.loginSection.classList.remove('hidden');
-            }
-        }
-
-        // عرض الصفحة الرئيسية
-        function renderHomePage() {
-            // عرض الفئات
-            renderCategories();
-            
-            // عرض العروض الخاصة
-            renderOffers();
-            
-            // عرض المنتجات
-            renderProducts();
-        }
-        
-        // عرض العروض الخاصة
-        function renderOffers() {
-            elements.offersGrid.innerHTML = '';
-            
-            const today = new Date().toISOString().split('T')[0];
-            const activeOffers = offers.filter(offer => 
-                offer.startDate <= today && 
-                offer.endDate >= today
-            );
-            
-            if (activeOffers.length === 0) {
-                elements.emptyOffers.classList.remove('hidden');
-                return;
-            }
-            
-            elements.emptyOffers.classList.add('hidden');
-            
-            // الحصول على المنتجات ذات العروض النشطة
-            const offerProducts = products.filter(product => 
-                activeOffers.some(offer => offer.productId === product.id)
-            );
-            
-            if (offerProducts.length === 0) {
-                elements.emptyOffers.classList.remove('hidden');
-                return;
-            }
-            
-            offerProducts.forEach(product => {
-                const offer = activeOffers.find(o => o.productId === product.id);
-                const discountedPrice = getDiscountedPrice(product.price, offer.discount);
-                
-                const productCard = document.createElement('div');
-                productCard.className = 'bg-white rounded-xl shadow-md hover:shadow-xl transition-all overflow-hidden group fade-in cursor-pointer';
-                productCard.innerHTML = `
-                    <div class="relative overflow-hidden h-56">
-                        <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
-                        <div class="discount-badge">خصم ${offer.discount}%</div>
-                        <button class="favorite-btn ${isFavorite(product.id) ? 'active' : ''}" data-product="${product.id}">
-                            <i class="fas fa-heart text-xl"></i>
-                        </button>
-                    </div>
-                    <div class="p-5">
-                        <h3 class="font-bold text-lg mb-2 text-slate-800">${product.name}</h3>
-                        <p class="text-slate-600 text-sm mb-4 line-clamp-2">${product.description}</p>
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                <span class="text-2xl font-bold text-red-600">${discountedPrice.toFixed(2)} ر.س</span>
-                                <span class="original-price block text-sm">${product.price} ر.س</span>
-                            </div>
-                        </div>
-                        <button class="add-to-cart w-full py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-lg font-medium hover:shadow-lg transition-all">
-                            إضافة للسلة
-                        </button>
-                    </div>
-                `;
-                
-                const addToCartBtn = productCard.querySelector('.add-to-cart');
-                const favoriteBtn = productCard.querySelector('.favorite-btn');
-                const productImage = productCard.querySelector('img');
-                
-                // إضافة حدث النقر على صورة المنتج لعرض التفاصيل
-                productImage.addEventListener('click', () => showProductDetails(product));
-                
-                addToCartBtn.addEventListener('click', () => addToCart({
-                    ...product,
-                    price: discountedPrice
-                }));
-                favoriteBtn.addEventListener('click', () => {
-                    toggleFavorite(product.id);
-                    favoriteBtn.classList.toggle('active');
-                });
-                
-                elements.offersGrid.appendChild(productCard);
-            });
-        }
-
-        // عرض الفئات
-        function renderCategories() {
-            elements.categoriesList.innerHTML = '';
-            
-            // إضافة فئة "الكل"
-            const allButton = document.createElement('button');
-            allButton.className = `px-4 py-2 rounded-lg font-medium transition-all ${
-                selectedCategory === 'all'
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-            }`;
-            allButton.textContent = 'الكل';
-            allButton.dataset.category = 'all';
-            allButton.addEventListener('click', () => {
-                selectedCategory = 'all';
-                render();
-            });
-            elements.categoriesList.appendChild(allButton);
-            
-            // إضافة الفئات الأخرى
-            categories.forEach(cat => {
-                const button = document.createElement('button');
-                button.className = `px-4 py-2 rounded-lg font-medium transition-all ${
-                    selectedCategory === cat.id
-                        ? 'bg-blue-600 text-white shadow-md'
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                }`;
-                button.textContent = cat.name;
-                button.dataset.category = cat.id;
-                button.addEventListener('click', () => {
-                    selectedCategory = cat.id;
-                    render();
-                });
-                elements.categoriesList.appendChild(button);
-            });
-        }
-
-        // عرض المنتجات
-        function renderProducts() {
-            elements.productsGrid.innerHTML = '';
-            
-            let filteredProducts = selectedCategory === 'all'
-                ? products
-                : products.filter(p => p.category === selectedCategory);
-            
-            // تطبيق فلتر السعر
-            if (selectedPriceFilter !== 'all') {
-                filteredProducts = filteredProducts.filter(product => {
-                    const price = product.price;
-                    switch(selectedPriceFilter) {
-                        case '0-50': return price < 50;
-                        case '50-100': return price >= 50 && price <= 100;
-                        case '100-200': return price >= 100 && price <= 200;
-                        case '200+': return price > 200;
-                        default: return true;
-                    }
-                });
-            }
-            
-            // تطبيق فلتر البحث
-            if (searchQuery) {
-                const query = searchQuery.toLowerCase();
-                filteredProducts = filteredProducts.filter(product => 
-                    product.name.toLowerCase().includes(query) || 
-                    product.description.toLowerCase().includes(query)
-                );
-            }
-            
-            // تطبيق الترتيب
-            if (sortOption !== 'default') {
-                filteredProducts.sort((a, b) => {
-                    switch(sortOption) {
-                        case 'price-low':
-                            return a.price - b.price;
-                        case 'price-high':
-                            return b.price - a.price;
-                        case 'name':
-                            return a.name.localeCompare(b.name);
-                        case 'rating':
-                            return getProductRating(b.id) - getProductRating(a.id);
-                        default:
-                            return 0;
-                    }
-                });
-            }
-            
-            if (filteredProducts.length === 0) {
-                elements.emptyProducts.classList.remove('hidden');
-                return;
-            }
-            
-            elements.emptyProducts.classList.add('hidden');
-            
-            filteredProducts.forEach(product => {
-                const offer = getProductOffer(product.id);
-                const finalPrice = offer ? getDiscountedPrice(product.price, offer.discount) : product.price;
-                const rating = getProductRating(product.id);
-                const userRating = getUserRating(product.id);
-                
-                const productCard = document.createElement('div');
-                productCard.className = 'bg-white rounded-xl shadow-md hover:shadow-xl transition-all overflow-hidden group fade-in cursor-pointer';
-                productCard.innerHTML = `
-                    <div class="relative overflow-hidden h-56">
-                        <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
-                        ${offer ? `<div class="discount-badge">خصم ${offer.discount}%</div>` : ''}
-                        <button class="favorite-btn ${isFavorite(product.id) ? 'active' : ''}" data-product="${product.id}">
-                            <i class="fas fa-heart text-xl"></i>
-                        </button>
-                    </div>
-                    <div class="p-5">
-                        <h3 class="font-bold text-lg mb-2 text-slate-800">${product.name}</h3>
-                        <p class="text-slate-600 text-sm mb-4 line-clamp-2">${product.description}</p>
-                        
-                        <!-- قسم التقييم -->
-                        <div class="flex items-center justify-between mb-3">
-                            <div class="star-rating flex">
-                                ${[1,2,3,4,5].map(star => `
-                                    <button class="rate-star ${userRating >= star ? 'text-yellow-400' : 'text-gray-300'}" data-product="${product.id}" data-rating="${star}">
-                                        <i class="fas fa-star"></i>
-                                    </button>
-                                `).join('')}
-                            </div>
-                            <span class="text-sm text-slate-500">(${rating.toFixed(1)})</span>
-                        </div>
-                        
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                ${offer ? `
-                                    <span class="text-2xl font-bold text-red-600">${finalPrice.toFixed(2)} ر.س</span>
-                                    <span class="original-price block text-sm">${product.price} ر.س</span>
-                                ` : `
-                                    <span class="text-2xl font-bold text-blue-600">${product.price} ر.س</span>
-                                `}
-                            </div>
-                            <span class="text-sm text-slate-500">المتاح: ${product.quantity}</span>
-                        </div>
-                        <button class="add-to-cart w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg transition-all">
-                            إضافة للسلة
-                        </button>
-                    </div>
-                `;
-                
-                const addToCartBtn = productCard.querySelector('.add-to-cart');
-                const favoriteBtn = productCard.querySelector('.favorite-btn');
-                const rateStars = productCard.querySelectorAll('.rate-star');
-                const productImage = productCard.querySelector('img');
-                
-                // إضافة حدث النقر على صورة المنتج لعرض التفاصيل
-                productImage.addEventListener('click', () => showProductDetails(product));
-                
-                addToCartBtn.addEventListener('click', () => addToCart({
-                    ...product,
-                    price: finalPrice
-                }));
-                
-                favoriteBtn.addEventListener('click', () => {
-                    toggleFavorite(product.id);
-                    favoriteBtn.classList.toggle('active');
-                });
-                
-                rateStars.forEach(star => {
-                    star.addEventListener('click', () => {
-                        const rating = parseInt(star.dataset.rating);
-                        rateProduct(product.id, rating);
-                    });
-                });
-                
-                elements.productsGrid.appendChild(productCard);
-            });
-        }
-        
-        // عرض صفحة المفضلة
-        function renderFavoritesPage() {
-            elements.favoritesGrid.innerHTML = '';
-            
-            if (!currentUser) {
-                elements.emptyFavorites.classList.remove('hidden');
-                return;
-            }
-            
-            const userFavorites = favorites.filter(fav => fav.userId === currentUser.id);
-            const favoriteProducts = products.filter(product => 
-                userFavorites.some(fav => fav.productId === product.id)
-            );
-            
-            if (favoriteProducts.length === 0) {
-                elements.emptyFavorites.classList.remove('hidden');
-                return;
-            }
-            
-            elements.emptyFavorites.classList.add('hidden');
-            
-            favoriteProducts.forEach(product => {
-                const offer = getProductOffer(product.id);
-                const finalPrice = offer ? getDiscountedPrice(product.price, offer.discount) : product.price;
-                const rating = getProductRating(product.id);
-                
-                const productCard = document.createElement('div');
-                productCard.className = 'bg-white rounded-xl shadow-md hover:shadow-xl transition-all overflow-hidden group fade-in cursor-pointer';
-                productCard.innerHTML = `
-                    <div class="relative overflow-hidden h-56">
-                        <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
-                        ${offer ? `<div class="discount-badge">خصم ${offer.discount}%</div>` : ''}
-                        <button class="favorite-btn active" data-product="${product.id}">
-                            <i class="fas fa-heart text-xl"></i>
-                        </button>
-                    </div>
-                    <div class="p-5">
-                        <h3 class="font-bold text-lg mb-2 text-slate-800">${product.name}</h3>
-                        <p class="text-slate-600 text-sm mb-4 line-clamp-2">${product.description}</p>
-                        
-                        <!-- قسم التقييم -->
-                        <div class="flex items-center justify-between mb-3">
-                            <div class="star-rating">
-                                ${[1,2,3,4,5].map(star => `
-                                    <i class="fas fa-star ${rating >= star ? 'text-yellow-400' : 'text-gray-300'}"></i>
-                                `).join('')}
-                            </div>
-                            <span class="text-sm text-slate-500">(${rating.toFixed(1)})</span>
-                        </div>
-                        
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                ${offer ? `
-                                    <span class="text-2xl font-bold text-red-600">${finalPrice.toFixed(2)} ر.س</span>
-                                    <span class="original-price block text-sm">${product.price} ر.س</span>
-                                ` : `
-                                    <span class="text-2xl font-bold text-blue-600">${product.price} ر.س</span>
-                                `}
-                            </div>
-                            <span class="text-sm text-slate-500">المتاح: ${product.quantity}</span>
-                        </div>
-                        <button class="add-to-cart w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg transition-all">
-                            إضافة للسلة
-                        </button>
-                    </div>
-                `;
-                
-                const addToCartBtn = productCard.querySelector('.add-to-cart');
-                const favoriteBtn = productCard.querySelector('.favorite-btn');
-                const productImage = productCard.querySelector('img');
-                
-                // إضافة حدث النقر على صورة المنتج لعرض التفاصيل
-                productImage.addEventListener('click', () => showProductDetails(product));
-                
-                addToCartBtn.addEventListener('click', () => addToCart({
-                    ...product,
-                    price: finalPrice
-                }));
-                
-                favoriteBtn.addEventListener('click', () => {
-                    toggleFavorite(product.id);
-                    // إزالة البطاقة من صفحة المفضلة بعد إلغاء التفضيل
-                    if (!isFavorite(product.id)) {
-                        productCard.remove();
-                        if (elements.favoritesGrid.children.length === 0) {
-                            elements.emptyFavorites.classList.remove('hidden');
-                        }
-                    }
-                });
-                
-                elements.favoritesGrid.appendChild(productCard);
-            });
-        }
-        
-        // عرض صفحة الطلبات
-        function renderOrdersPage() {
-            elements.ordersList.innerHTML = '';
-            
-            if (!currentUser) {
-                elements.emptyOrders.classList.remove('hidden');
-                return;
-            }
-            
-            const userOrders = orders.filter(order => order.userId === currentUser.id);
-            
-            if (userOrders.length === 0) {
-                elements.emptyOrders.classList.remove('hidden');
-                return;
-            }
-            
-            elements.emptyOrders.classList.add('hidden');
-            
-            // ترتيب الطلبات حسب التاريخ (الأحدث أولاً)
-            userOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            userOrders.forEach(order => {
-                const orderElement = document.createElement('div');
-                orderElement.className = 'bg-white rounded-xl shadow-md p-6 fade-in';
-                orderElement.innerHTML = `
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <h3 class="font-bold text-lg">طلب #${order.id}</h3>
-                            <p class="text-slate-500">${new Date(order.date).toLocaleDateString('ar-KW')}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-bold text-lg text-blue-600">${order.total.toFixed(2)} ر.س</p>
-                            <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">مكتمل</span>
-                        </div>
-                    </div>
-                    <div class="border-t pt-4">
-                        <h4 class="font-bold mb-2">المنتجات:</h4>
-                        <div class="space-y-2">
-                            ${order.items.map(item => `
-                                <div class="flex justify-between">
-                                    <span>${item.name} (${item.quantity})</span>
-                                    <span>${(item.price * item.quantity).toFixed(2)} ر.س</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-                
-                elements.ordersList.appendChild(orderElement);
-            });
-        }
-
-        // عرض صفحة السلة
-        function renderCartPage() {
-            if (cart.length === 0) {
-                elements.emptyCart.classList.remove('hidden');
-                elements.cartItems.classList.add('hidden');
-                return;
-            }
-            
-            elements.emptyCart.classList.add('hidden');
-            elements.cartItems.classList.remove('hidden');
-            
-            // مسح عناصر السلة
-            const cartItemsContainer = elements.cartItems;
-            // إزالة جميع العناصر باستثناء الأخير (قسم المجموع)
-            while (cartItemsContainer.children.length > 1) {
-                cartItemsContainer.removeChild(cartItemsContainer.firstChild);
-            }
-            
-            let total = 0;
-            
-            cart.forEach(item => {
-                const itemTotal = item.price * item.quantity;
-                total += itemTotal;
-                
-                const cartItem = document.createElement('div');
-                cartItem.className = 'bg-white rounded-xl shadow-md p-6 flex flex-col sm:flex-row gap-6 slide-in';
-                cartItem.innerHTML = `
-                    <img src="${item.image}" alt="${item.name}" class="w-full sm:w-32 h-32 object-cover rounded-lg">
-                    <div class="flex-1">
-                        <h3 class="font-bold text-xl mb-2">${item.name}</h3>
-                        <p class="text-blue-600 font-bold text-lg mb-4">${item.price} ر.س</p>
-                        <div class="flex items-center gap-4">
-                            <div class="flex items-center gap-2 bg-slate-100 rounded-lg p-1">
-                                <button class="decrease-quantity px-3 py-1 bg-white rounded hover:bg-slate-200 font-bold">-</button>
-                                <span class="quantity px-4 font-bold">${item.quantity}</span>
-                                <button class="increase-quantity px-3 py-1 bg-white rounded hover:bg-slate-200 font-bold">+</button>
-                            </div>
-                            <button class="remove-item p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all">
-                                <i class="fas fa-trash text-xl"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="text-left sm:text-right">
-                        <p class="text-slate-600 text-sm mb-1">المجموع</p>
-                        <p class="font-bold text-2xl text-blue-600">${itemTotal.toFixed(2)} ر.س</p>
-                    </div>
-                `;
-                
-                const decreaseBtn = cartItem.querySelector('.decrease-quantity');
-                const increaseBtn = cartItem.querySelector('.increase-quantity');
-                const removeBtn = cartItem.querySelector('.remove-item');
-                
-                decreaseBtn.addEventListener('click', () => updateCartQuantity(item.id, item.quantity - 1));
-                increaseBtn.addEventListener('click', () => updateCartQuantity(item.id, item.quantity + 1));
-                removeBtn.addEventListener('click', () => removeFromCart(item.id));
-                
-                cartItemsContainer.insertBefore(cartItem, cartItemsContainer.firstChild);
-            });
-            
-            elements.totalCart.textContent = `${total.toFixed(2)} ر.س`;
-        }
-
-        // عرض صفحة الإدارة
-        function renderAdminPage() {
-            if (currentUser && currentUser.role === 'admin') {
-                renderAdminProducts();
-                renderAdminCategories();
-                renderAdminOffers();
-            }
-        }
-
-        // عرض منتجات الإدارة
-        function renderAdminProducts() {
-            elements.adminProductsList.innerHTML = '';
-            
-            products.forEach(product => {
-                const productItem = document.createElement('div');
-                productItem.className = 'flex items-center gap-3 p-3 bg-slate-50 rounded-lg slide-in';
-                productItem.innerHTML = `
-                    <img src="${product.image}" alt="${product.name}" class="w-16 h-16 object-cover rounded-lg">
-                    <div class="flex-1">
-                        <h4 class="font-bold">${product.name}</h4>
-                        <p class="text-blue-600 font-bold">${product.price} ر.س</p>
-                        <p class="text-slate-500 text-sm">الكمية: ${product.quantity}</p>
-                    </div>
-                    <div class="flex gap-2">
-                        <button class="edit-product p-2 text-blue-600 hover:bg-blue-50 rounded-lg">
-                            <i class="fas fa-edit text-xl"></i>
-                        </button>
-                        <button class="delete-product p-2 text-red-600 hover:bg-red-50 rounded-lg">
-                            <i class="fas fa-trash text-xl"></i>
-                        </button>
-                    </div>
-                `;
-                
-                const editBtn = productItem.querySelector('.edit-product');
-                const deleteBtn = productItem.querySelector('.delete-product');
-                
-                editBtn.addEventListener('click', () => showProductModal(product));
-                deleteBtn.addEventListener('click', () => deleteProduct(product.id));
-                
-                elements.adminProductsList.appendChild(productItem);
-            });
-        }
-
-        // عرض فئات الإدارة
-        function renderAdminCategories() {
-            elements.adminCategoriesList.innerHTML = '';
-            
-            categories.forEach(category => {
-                const categoryItem = document.createElement('div');
-                categoryItem.className = 'flex items-center justify-between p-3 bg-slate-50 rounded-lg slide-in';
-                categoryItem.innerHTML = `
-                    <span class="font-medium">${category.name}</span>
-                    <button class="delete-category p-2 text-red-600 hover:bg-red-50 rounded-lg">
-                        <i class="fas fa-trash text-xl"></i>
-                    </button>
-                `;
-                
-                const deleteBtn = categoryItem.querySelector('.delete-category');
-                deleteBtn.addEventListener('click', () => deleteCategory(category.id));
-                
-                elements.adminCategoriesList.appendChild(categoryItem);
-            });
-        }
-        
-        // عرض عروض الإدارة
-        function renderAdminOffers() {
-            elements.adminOffersList.innerHTML = '';
-            
-            offers.forEach(offer => {
-                const product = products.find(p => p.id === offer.productId);
-                if (!product) return;
-                
-                const offerItem = document.createElement('div');
-                offerItem.className = 'flex items-center gap-3 p-3 bg-slate-50 rounded-lg slide-in';
-                offerItem.innerHTML = `
-                    <img src="${product.image}" alt="${product.name}" class="w-16 h-16 object-cover rounded-lg">
-                    <div class="flex-1">
-                        <h4 class="font-bold">${product.name}</h4>
-                        <p class="text-red-600 font-bold">خصم ${offer.discount}%</p>
-                        <p class="text-slate-500 text-sm">من ${offer.startDate} إلى ${offer.endDate}</p>
-                    </div>
-                    <div class="flex gap-2">
-                        <button class="edit-offer p-2 text-blue-600 hover:bg-blue-50 rounded-lg">
-                            <i class="fas fa-edit text-xl"></i>
-                        </button>
-                        <button class="delete-offer p-2 text-red-600 hover:bg-red-50 rounded-lg">
-                            <i class="fas fa-trash text-xl"></i>
-                        </button>
-                    </div>
-                `;
-                
-                const editBtn = offerItem.querySelector('.edit-offer');
-                const deleteBtn = offerItem.querySelector('.delete-offer');
-                
-                editBtn.addEventListener('click', () => showOfferModal(offer));
-                deleteBtn.addEventListener('click', () => deleteOffer(offer.id));
-                
-                elements.adminOffersList.appendChild(offerItem);
-            });
-        }
-
-        // تحديث عداد السلة
-        function updateCartCount() {
-            if (cart.length > 0) {
-                elements.cartCount.textContent = cart.length;
-                elements.cartCount.classList.remove('hidden');
-            } else {
-                elements.cartCount.classList.add('hidden');
-            }
-        }
-
-        // إضافة مستمع حدث لتحميل الصفحة بالكامل
-document.addEventListener('DOMContentLoaded', function() {
-    // تأكد من إخفاء شاشة التحميل إذا استغرقت أكثر من 8 ثواني
-    setTimeout(() => {
-        hideLoadingScreen();
-    }, 8000);
-});
-
-// إضافة زر طوارئ في حالة استمرار المشكلة (أضفه في الـ footer)
-// يمكنك إضافة هذا الزر في قسم الفوتر:
-// <button id="emergencyHideLoading" class="mt-2 px-3 py-1 bg-orange-500 text-white rounded text-sm">إخفاء شاشة التحميل</button>
-
-// ثم أضف هذا المستمع في دالة setupEventListeners():
-document.getElementById('emergencyHideLoading')?.addEventListener('click', hideLoadingScreen);
-
-        // تهيئة التطبيق
-// تهيئة التطبيق
-async function init() {
-    try {
-        console.log('بدء تهيئة التطبيق...');
-        
-        // إعداد مهلة زمنية قصوى لإخفاء شاشة التحميل (5 ثواني كحد أقصى)
-        const loadingTimeout = setTimeout(() => {
-            console.warn('انتهت مهلة التحميل، إخفاء شاشة التحميل بشكل إجباري');
-            hideLoadingScreen();
-        }, 5000);
-        
-        await loadData();
-        setupEventListeners();
-        
-        // محاولة إعداد التحديثات الفورية (لا تمنع التحميل)
-        setTimeout(() => {
-            if (firebaseInitialized) {
-                setupRealtimeUpdates();
-            }
-        }, 1000);
-        
-        render();
-        
-        // إخفاء شاشة التحميل بعد وقت قصير
-        setTimeout(() => {
-            clearTimeout(loadingTimeout); // إلغاء المهلة
-            hideLoadingScreen();
-            console.log('تم تحميل التطبيق بنجاح');
-        }, 1000);
-        
-    } catch (error) {
-        console.error('خطأ في تهيئة التطبيق:', error);
-        hideLoadingScreen();
-        showNotification('تم تحميل التطبيق في وضع عدم الاتصال', 'info');
-    }
-}
-
-// دالة مساعدة لإخفاء شاشة التحميل
-function hideLoadingScreen() {
-    const loadingScreen = document.getElementById('loadingScreen');
-    if (loadingScreen) {
-        loadingScreen.classList.add('hidden');
-    }
-}
-
-// حفظ البيانات مع الأولوية لـ Firebase
-async function saveData() {
-    try {
-        console.log('جاري حفظ البيانات...');
-        
-        // حفظ البيانات في Firebase أولاً (لضمان المزامنة بين جميع المستخدمين)
-        if (firebaseInitialized) {
-            try {
-                await Promise.all([
-                    Database.setItem('users', users),
-                    Database.setItem('categories', categories),
-                    Database.setItem('products', products),
-                    Database.setItem('offers', offers),
-                    Database.setItem('ratings', ratings),
-                    Database.setItem('favorites', favorites),
-                    Database.setItem('orders', orders)
-                ]);
-                console.log('تم حفظ البيانات في Firebase بنجاح');
-            } catch (firebaseError) {
-                console.warn('فشل حفظ البيانات في Firebase:', firebaseError);
-            }
-        }
-        
-        // حفظ البيانات في localStorage أيضاً (للنسخ الاحتياطي والأداء)
-        localStorage.setItem('users', JSON.stringify(users));
-        localStorage.setItem('categories', JSON.stringify(categories));
-        localStorage.setItem('products', JSON.stringify(products));
-        localStorage.setItem('offers', JSON.stringify(offers));
-        localStorage.setItem('ratings', JSON.stringify(ratings));
-        localStorage.setItem('favorites', JSON.stringify(favorites));
-        localStorage.setItem('orders', JSON.stringify(orders));
-        localStorage.setItem('cart', JSON.stringify(cart));
-        
-        // حفظ المستخدم الحالي في localStorage فقط
-        if (currentUser) {
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        } else {
-            localStorage.removeItem('currentUser');
-        }
-        
-        console.log('تم حفظ البيانات بنجاح');
-        return true;
-    } catch (error) {
-        console.error('خطأ في حفظ البيانات:', error);
-        showNotification('حدث خطأ في حفظ البيانات', 'error');
-        return false;
-    }
-}
-        // بدء التطبيق
-        init();
     </script>
 </body>
 </html>
