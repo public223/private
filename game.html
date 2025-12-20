@@ -1,10 +1,12 @@
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>مسابقات - جولة اللعب</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header class="game-header">
@@ -24,33 +26,16 @@
     </header>
 
     <main class="game-board-container">
+        <div class="game-status">
+            <div class="status-message" id="gameStatusMessage">
+                اختر سؤالاً من اللوحة لبدء الجولة
+            </div>
+        </div>
+
         <div class="categories-board">
             <!-- سيتم ملء هذا القسم بالجافاسكريبت -->
         </div>
-
-    <div class="score-control">
-        <div class="team-score-control team1-control">
-            <h4><i class="fas fa-users"></i> نقاط الفريق الأول</h4>
-            <div class="score-buttons">
-                <button class="minus-btn" data-team="team1"><i class="fas fa-minus"></i></button>
-                <span class="score-value" id="team1ControlScore">0</span>
-                <button class="plus-btn" data-team="team1"><i class="fas fa-plus"></i></button>
-            </div>
-            <button class="score-reset-btn" data-team="team1"><i class="fas fa-redo"></i></button>
-        </div>
-    
-        <div class="team-score-control team2-control">
-            <h4><i class="fas fa-users"></i> نقاط الفريق الثاني</h4>
-            <div class="score-buttons">
-                <button class="minus-btn" data-team="team2"><i class="fas fa-minus"></i></button>
-                <span class="score-value" id="team2ControlScore">0</span>
-                <button class="plus-btn" data-team="team2"><i class="fas fa-plus"></i></button>
-            </div>
-            <button class="score-reset-btn" data-team="team2"><i class="fas fa-redo"></i></button>
-        </div>
-    </div>
-
-
+        
         <div class="question-display" id="questionDisplay">
             <div class="question-header">
                 <div class="question-category">
@@ -67,7 +52,7 @@
             </div>
 
             <div class="question-content">
-                <h2 id="questionText">هذا هو السؤال الذي سيظهر هنا عندما يختار اللاعب أحد خيارات النقاط؟</h2>
+                <h2 id="questionText">هذا هو السؤال الذي سيظهر هنا عندما يختار اللاعب أحد خيارات النقاط</h2>
                 <div id="questionImageContainer" class="question-image-container" style="display: none;">
                     <img id="questionImage" src="" alt="صورة السؤال">
                 </div>
@@ -77,7 +62,7 @@
                 <div class="team-panel team1-panel">
                     <div class="team-info">
                         <h3 id="team1NameDisplay">الفريق الأول</h3>
-                        <div class="team-score"><span id="team1Score">1500</span> نقطة</div>
+                        <div class="team-score"><span id="team1Score">0</span> نقطة</div>
                     </div>
                     <div class="team-help-options">
                         <button class="help-option-btn" data-help="callFriend" title="اتصال بصديق">
@@ -95,7 +80,7 @@
                 <div class="team-panel team2-panel">
                     <div class="team-info">
                         <h3 id="team2NameDisplay">الفريق الثاني</h3>
-                        <div class="team-score"><span id="team2Score">1200</span> نقطة</div>
+                        <div class="team-score"><span id="team2Score">0</span> نقطة</div>
                     </div>
                     <div class="team-help-options">
                         <button class="help-option-btn" data-help="callFriend" title="اتصال بصديق">
@@ -130,7 +115,7 @@
             <div class="modal-content">
                 <h2 id="winnerTitle">الفائز هو: <span id="winnerTeamName">الفريق الأول</span></h2>
                 <div class="winner-score">
-                    <span id="winnerScore">1500</span> نقطة
+                    <span id="winnerScore">0</span> نقطة
                 </div>
                 <div class="winner-actions">
                     <button class="modal-btn play-again-btn"><i class="fas fa-redo"></i> لعب مرة أخرى</button>
@@ -141,6 +126,29 @@
         </div>
     </main>
 
+    <div class="score-control">
+        <div class="team-score-control team1-control">
+            <h4><i class="fas fa-users"></i> نقاط الفريق الأول</h4>
+            <div class="score-buttons">
+                <button class="minus-btn" data-team="team1"><i class="fas fa-minus"></i></button>
+                <span class="score-value" id="team1ControlScore">0</span>
+                <button class="plus-btn" data-team="team1"><i class="fas fa-plus"></i></button>
+            </div>
+            <button class="score-reset-btn" data-team="team1"><i class="fas fa-redo"></i></button>
+        </div>
+    
+        <div class="team-score-control team2-control">
+            <h4><i class="fas fa-users"></i> نقاط الفريق الثاني</h4>
+            <div class="score-buttons">
+                <button class="minus-btn" data-team="team2"><i class="fas fa-minus"></i></button>
+                <span class="score-value" id="team2ControlScore">0</span>
+                <button class="plus-btn" data-team="team2"><i class="fas fa-plus"></i></button>
+            </div>
+            <button class="score-reset-btn" data-team="team2"><i class="fas fa-redo"></i></button>
+        </div>
+    </div>
+
     <script src="js/game.js"></script>
+    <script src="js/auth.js"></script>
 </body>
 </html>
