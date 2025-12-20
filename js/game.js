@@ -187,6 +187,17 @@ function initGamePage() {
             }
         });
     });
+
+    // إضافة معالجات أحداث للأزرار الجديدة
+    document.querySelector('.end-game-btn').addEventListener('click', endGame);
+    document.querySelector('.back-to-board-btn').addEventListener('click', backToBoard);
+    document.querySelector('.exit-game-btn').addEventListener('click', exitGame);
+    
+    // تحديث حالة اللعبة
+    updateGameStatus('اختر سؤالاً من اللوحة لبدء الجولة');
+    
+    // تحديث أزرار المساعدات
+    updateHelpButtons();
 }
 
 function updateScores() {
@@ -268,7 +279,6 @@ function updateCurrentPlayerDisplay() {
 }
 
 // عرض لوحة اللعبة
-// تعديل دالة renderGameBoard()
 function renderGameBoard() {
     const categoriesBoard = document.querySelector('.categories-board');
     categoriesBoard.innerHTML = '';
@@ -278,180 +288,173 @@ function renderGameBoard() {
 
         const categoryColumn = document.createElement('div');
         categoryColumn.className = 'category-column';
-        categoryColumn.style.display = 'grid';
-        categoryColumn.style.gridTemplateColumns = 'auto 1fr auto';
-        categoryColumn.style.alignItems = 'center';
-        categoryColumn.style.gap = 'clamp(16px, 3vw, 40px)';
 
-        /* ===== نقاط اليسار ===== */
-        const leftPoints = document.createElement('div');
-        leftPoints.className = 'points-column left';
-
+        // النقاط العلوية (200, 400, 600)
+        const topPoints = document.createElement('div');
+        topPoints.className = 'points-row top';
+        
         [200, 400, 600].forEach(points => {
-            const pointOption = document.createElement('div');
-            pointOption.className = 'point-option';
-            pointOption.textContent = points;
-            pointOption.dataset.categoryId = categoryId;
-            pointOption.dataset.points = points;
-            pointOption.addEventListener('click', selectQuestion);
-
-            /* تكبير النقاط */
-            pointOption.style.height = 'clamp(50px, 8vw, 100px)';
-            pointOption.style.minWidth = 'clamp(50px, 8vw, 100px)';
-            pointOption.style.fontSize = 'clamp(16px, 2.5vw, 28px)';
-
-            const questionKey = `${categoryId}-${points}`;
-            if (answeredQuestions.includes(questionKey)) {
-                pointOption.style.opacity = '0.5';
-                pointOption.style.cursor = 'not-allowed';
-            }
-
-            leftPoints.appendChild(pointOption);
+            const pointOption = createPointOption(categoryId, points);
+            topPoints.appendChild(pointOption);
         });
 
-        /* ===== صورة الفئة ===== */
-        const categoryCard = document.createElement('div');
-        categoryCard.className = 'category-card';
-        categoryCard.innerHTML = `
-            <img src="${category.image}" alt="${category.name}" class="category-image">
-            <div class="category-title">${category.name}</div>
+        // صورة الفئة
+        const categoryImageContainer = document.createElement('div');
+        categoryImageContainer.className = 'category-image-container';
+        categoryImageContainer.innerHTML = `
+            <img src="${category.image}" alt="${category.name}">
         `;
 
-        const img = categoryCard.querySelector('.category-image');
-        img.style.width = 'clamp(100px, 15vw, 250px)';
-        img.style.height = 'auto';
-        img.style.objectFit = 'contain';
+        // عنوان الفئة
+        const categoryTitle = document.createElement('div');
+        categoryTitle.className = 'category-title';
+        categoryTitle.textContent = category.name;
 
-        /* ===== نقاط اليمين ===== */
-        const rightPoints = document.createElement('div');
-        rightPoints.className = 'points-column right';
-
+        // النقاط السفلية (نفس الأرقام)
+        const bottomPoints = document.createElement('div');
+        bottomPoints.className = 'points-row bottom';
+        
         [200, 400, 600].forEach(points => {
-            const pointOption = document.createElement('div');
-            pointOption.className = 'point-option';
-            pointOption.textContent = points;
-            pointOption.dataset.categoryId = categoryId;
-            pointOption.dataset.points = points;
-            pointOption.addEventListener('click', selectQuestion);
-
-            pointOption.style.height = 'clamp(50px, 8vw, 100px)';
-            pointOption.style.minWidth = 'clamp(50px, 8vw, 100px)';
-            pointOption.style.fontSize = 'clamp(16px, 2.5vw, 28px)';
-
-            const questionKey = `${categoryId}-${points}`;
-            if (answeredQuestions.includes(questionKey)) {
-                pointOption.style.opacity = '0.5';
-                pointOption.style.cursor = 'not-allowed';
-            }
-
-            rightPoints.appendChild(pointOption);
+            const pointOption = createPointOption(categoryId, points);
+            bottomPoints.appendChild(pointOption);
         });
 
-        /* ===== الترتيب النهائي ===== */
-        categoryColumn.appendChild(leftPoints);
-        categoryColumn.appendChild(categoryCard);
-        categoryColumn.appendChild(rightPoints);
+        // تجميع العناصر
+        categoryColumn.appendChild(topPoints);
+        categoryColumn.appendChild(categoryImageContainer);
+        categoryColumn.appendChild(categoryTitle);
+        categoryColumn.appendChild(bottomPoints);
 
         categoriesBoard.appendChild(categoryColumn);
     });
 }
 
-
-// اختيار سؤال
-function selectQuestion(e) {
-    const categoryId = parseInt(e.target.dataset.categoryId);
-    const points = parseInt(e.target.dataset.points);
+// وظيفة مساعدة لإنشاء خيار النقاط
+function createPointOption(categoryId, points) {
+    const pointOption = document.createElement('div');
+    pointOption.className = 'point-option';
+    pointOption.dataset.categoryId = categoryId;
+    pointOption.dataset.points = points;
     
-    // التحقق إذا كان السؤال قد تمت الإجابة عليه مسبقاً
+    // إضافة الحدث للنقر
+    pointOption.addEventListener('click', function(e) {
+        e.stopPropagation();
+        selectQuestion(this);
+    });
+    
+    // إنشاء محتوى النقاط
+    const pointsValue = document.createElement('div');
+    pointsValue.className = 'points-value';
+    pointsValue.textContent = points;
+    
+    // إنشاء نافذة النقاط المصغرة
+    const miniScoreWindow = document.createElement('div');
+    miniScoreWindow.className = 'mini-score-window';
+    miniScoreWindow.innerHTML = `
+        <div class="team-scores">
+            <div class="team-mini-score team1-mini">
+                <span class="team-mini-name">${gameData.currentGame.team1.name}</span>
+                <span class="team-mini-points">${gameData.currentGame.team1.score}</span>
+            </div>
+            <div class="team-mini-score team2-mini">
+                <span class="team-mini-name">${gameData.currentGame.team2.name}</span>
+                <span class="team-mini-points">${gameData.currentGame.team2.score}</span>
+            </div>
+        </div>
+    `;
+
+    // تجميع العناصر
+    pointOption.appendChild(pointsValue);
+    pointOption.appendChild(miniScoreWindow);
+
+    // التحقق إذا كان السؤال قد تمت الإجابة عليه
     const questionKey = `${categoryId}-${points}`;
     if (answeredQuestions.includes(questionKey)) {
-        alert('لقد تمت الإجابة على هذا السؤال مسبقاً');
+        pointOption.classList.add('used');
+        pointOption.style.cursor = 'not-allowed';
+        pointOption.style.opacity = '0.4';
+    } else {
+        pointOption.style.cursor = 'pointer';
+    }
+
+    return pointOption;
+}
+
+// اختيار سؤال
+function selectQuestion(element) {
+    // التحقق إذا كان العنصر معطلاً
+    if (element.classList.contains('used')) {
+        updateGameStatus('⚠️ هذا السؤال تمت الإجابة عليه مسبقاً');
         return;
     }
+    
+    const categoryId = parseInt(element.dataset.categoryId);
+    const points = parseInt(element.dataset.points);
+    
+    updateGameStatus('📝 جارٍ تحضير السؤال...');
     
     if (gameData.timerInterval) {
         clearInterval(gameData.timerInterval);
         gameData.timerInterval = null;
     }
     
+    // الحصول على الأسئلة المتاحة
     const categoryQuestions = gameData.questions[categoryId][points];
+    
+    if (!categoryQuestions || categoryQuestions.length === 0) {
+        alert('لا توجد أسئلة متاحة لهذه الفئة والنقاط');
+        updateGameStatus('⚠️ لا توجد أسئلة متاحة');
+        return;
+    }
+    
+    // اختيار سؤال عشوائي
     const randomIndex = Math.floor(Math.random() * categoryQuestions.length);
     gameData.currentQuestion = categoryQuestions[randomIndex];
     gameData.currentQuestion.categoryId = categoryId;
     gameData.currentQuestion.points = points;
     
-    // عرض السؤال
-    const category = gameData.categories.find(c => c.id === categoryId);
-    document.getElementById('questionCategoryName').textContent = category.name;
-    document.getElementById('questionCategoryImage').src = category.image;
-    document.getElementById('questionPoints').textContent = points;
-    document.getElementById('questionText').textContent = gameData.currentQuestion.text;
+    // تعطيل السؤال المختار
+    element.classList.add('used');
+    element.style.opacity = '0.4';
+    element.style.cursor = 'not-allowed';
     
-    const questionImageContainer = document.getElementById('questionImageContainer');
-    if (gameData.currentQuestion.image) {
-        document.getElementById('questionImage').src = gameData.currentQuestion.image;
-        questionImageContainer.style.display = 'block';
-    } else {
-        questionImageContainer.style.display = 'none';
+    // إضافة السؤال للقائمة المؤقتة للإجابات
+    const questionKey = `${categoryId}-${points}`;
+    if (!answeredQuestions.includes(questionKey)) {
+        answeredQuestions.push(questionKey);
     }
     
-    resetTimer();
-    startTimer();
-    
-    document.querySelector('.categories-board').style.display = 'none';
-    document.getElementById('questionDisplay').style.display = 'block';
-    gameData.gameState = 'question';
-    
-    document.querySelectorAll('.help-option-btn[data-help="hole"]').forEach(btn => {
-        btn.disabled = gameData.currentGame.usedHelps.team1.includes('hole') || 
-                       gameData.currentGame.usedHelps.team2.includes('hole');
-    });
-}
-
-function initGamePage() {
-    loadGameData();
-    renderGameBoard();
-    
-    document.getElementById('timerControlBtn').addEventListener('click', toggleTimer);
-    
-    document.querySelector('.team1-answer-btn').addEventListener('click', () => answerQuestion('team1'));
-    document.querySelector('.team2-answer-btn').addEventListener('click', () => answerQuestion('team2'));
-    document.querySelector('.no-answer-btn').addEventListener('click', () => answerQuestion('none'));
-    
-    document.querySelectorAll('.help-option-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const helpType = this.dataset.help;
-            const team = this.closest('.team1-panel') ? 'team1' : 'team2';
-            useHelp(helpType, team);
-        });
-    });
-    
-    document.querySelector('.close-modal-btn').addEventListener('click', closeHelpModal);
-    document.querySelector('.play-again-btn').addEventListener('click', resetGame);
-    document.querySelector('.new-game-btn').addEventListener('click', () => {
-        window.location.href = 'create-game.html';
-    });
-    document.querySelector('.exit-btn').addEventListener('click', () => {
-        window.location.href = 'index.html';
-    });
-    
-    // إضافة معالجات أحداث لأزرار التحكم بالنقاط
-    document.querySelectorAll('.plus-btn, .minus-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const team = this.dataset.team;
-            const isPlus = this.classList.contains('plus-btn');
-            const points = isPlus ? 100 : -100;
-            
-            gameData.currentGame[team].score += points;
-            updateScores();
-            localStorage.setItem('currentQuizGame', JSON.stringify(gameData.currentGame));
-        });
-    });
-
-    // إضافة معالجات أحداث للأزرار الجديدة
-    document.querySelector('.end-game-btn').addEventListener('click', endGame);
-    document.querySelector('.back-to-board-btn').addEventListener('click', backToBoard);
-    document.querySelector('.exit-game-btn').addEventListener('click', exitGame);
+    // عرض السؤال
+    const category = gameData.categories.find(c => c.id === categoryId);
+    if (category) {
+        document.getElementById('questionCategoryName').textContent = category.name;
+        document.getElementById('questionCategoryImage').src = category.image;
+        document.getElementById('questionPoints').textContent = points;
+        document.getElementById('questionText').textContent = gameData.currentQuestion.text;
+        
+        // عرض الصورة إذا كانت موجودة
+        const questionImageContainer = document.getElementById('questionImageContainer');
+        if (gameData.currentQuestion.image) {
+            document.getElementById('questionImage').src = gameData.currentQuestion.image;
+            questionImageContainer.style.display = 'block';
+        } else {
+            questionImageContainer.style.display = 'none';
+        }
+        
+        // إظهار قسم السؤال
+        document.getElementById('questionDisplay').style.display = 'block';
+        
+        // إخفاء لوحة الأسئلة
+        document.querySelector('.categories-board').style.display = 'none';
+        
+        // بدء التوقيت للسؤال فقط
+        resetTimer();
+        startTimer();
+        
+        // تحديث حالة اللعبة
+        gameData.gameState = 'question';
+        updateGameStatus(`🎯 السؤال قيد التشغيل - ${points} نقطة`);
+    }
 }
 
 // إنهاء اللعبة وإظهار الفائز
@@ -466,11 +469,21 @@ function backToBoard() {
     if (gameData.gameState === 'question') {
         if (confirm('هل تريد حقاً العودة إلى اللوحة؟ سيتم فقدان السؤال الحالي.')) {
             pauseTimer();
-            document.getElementById('questionDisplay').style.display = 'none';
-            document.querySelector('.categories-board').style.display = 'grid';
-            gameData.gameState = 'board';
+            hideQuestionDisplay();
+            updateGameStatus('↩️ عدت إلى لوحة الأسئلة');
         }
+    } else {
+        updateGameStatus('⚠️ أنت بالفعل في لوحة الأسئلة');
     }
+}
+
+function hideQuestionDisplay() {
+    document.getElementById('questionDisplay').style.display = 'none';
+    document.querySelector('.categories-board').style.display = 'grid';
+    gameData.gameState = 'board';
+    
+    // تحديث الألواح لتظهر الأسئلة المستخدمة
+    renderGameBoard();
 }
 
 // الخروج من اللعبة
@@ -480,48 +493,40 @@ function exitGame() {
     }
 }
 
-// الرجوع إلى لوحة اللعبة
-function backToBoard() {
-    if (gameData.gameState === 'question') {
-        if (confirm('هل تريد حقاً العودة إلى اللوحة؟ سيتم فقدان السؤال الحالي.')) {
-            // إيقاف المؤقت إذا كان يعمل
-            pauseTimer();
-            
-            // إخفاء قسم عرض السؤال
-            document.getElementById('questionDisplay').style.display = 'none';
-            
-            // إظهار لوحة الأسئلة
-            document.querySelector('.categories-board').style.display = 'grid';
-            
-            // تغيير حالة اللعبة إلى اللوحة
-            gameData.gameState = 'board';
-            
-            // تحديث واجهة المستخدم لإظهار أن السؤال لم يعد نشطاً
-            document.querySelector('.current-player-display').style.opacity = '1';
-        }
-    } else {
-        alert('أنت بالفعل في لوحة اللعبة الرئيسية');
-    }
-}
-
-document.querySelector('.back-to-board-btn').addEventListener('click', backToBoard);
-
-console.log('حالة اللعبة الحالية:', gameData.gameState);
-console.log('عنصر لوحة الأسئلة:', document.querySelector('.categories-board'));
-console.log('عنصر عرض السؤال:', document.getElementById('questionDisplay'));
-
-// التحكم في المؤقت
+// التحكم في مؤقت السؤال (30 ثانية فقط لكل سؤال)
+// التحكم في مؤقت السؤال (وقت لا نهائي يبدأ من 00:01)
 function startTimer() {
-    gameData.timeLeft = 30;
-    document.getElementById('timerDisplay').textContent = gameData.timeLeft;
+    let totalSeconds = 0; // يبدأ من 00:01
+    const timerDisplay = document.getElementById('timerDisplay');
+    
+    // عرض الوقت بالصيغة MM:SS
+    function updateTimerDisplay(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        timerDisplay.textContent = 
+            `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+    
+    // عرض الوقت الأولي
+    updateTimerDisplay(totalSeconds);
+    
+    // إزالة أي تأثيرات سابقة
+    timerDisplay.style.color = '';
+    timerDisplay.style.fontWeight = '';
+    timerDisplay.style.animation = '';
     
     gameData.timerInterval = setInterval(() => {
-        gameData.timeLeft--;
-        document.getElementById('timerDisplay').textContent = gameData.timeLeft;
+        totalSeconds++;
+        updateTimerDisplay(totalSeconds);
         
-        if (gameData.timeLeft <= 0) {
-            pauseTimer();
-            answerQuestion('none');
+        // تغيير اللون كل 5 دقائق (300 ثانية) للتمييز
+        if (totalSeconds % 300 === 0) {
+            timerDisplay.style.color = '#3498db';
+            timerDisplay.style.fontWeight = 'bold';
+            setTimeout(() => {
+                timerDisplay.style.color = '';
+                timerDisplay.style.fontWeight = '';
+            }, 2000);
         }
     }, 1000);
 }
@@ -533,9 +538,92 @@ function pauseTimer() {
 
 function resetTimer() {
     pauseTimer();
+    const timerDisplay = document.getElementById('timerDisplay');
+    timerDisplay.textContent = '00:00';
+    timerDisplay.style.color = '';
+    timerDisplay.style.fontWeight = '';
+    timerDisplay.style.animation = '';
+    const timerControlBtn = document.getElementById('timerControlBtn');
+    if (timerControlBtn) {
+        timerControlBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    }
+}
+
+function toggleTimer() {
+    if (gameData.timerInterval) {
+        pauseTimer();
+        document.getElementById('timerControlBtn').innerHTML = '<i class="fas fa-play"></i>';
+    } else {
+        startTimer();
+        document.getElementById('timerControlBtn').innerHTML = '<i class="fas fa-pause"></i>';
+    }
+}
+
+// تعديل دالة answerQuestion لإزالة التحقق من انتهاء الوقت
+function answerQuestion(team) {
+    pauseTimer(); // إيقاف التوقيت فقط دون التحقق من الوقت
+    
+    let points = gameData.currentQuestion.points;
+    
+    if (team !== 'none') {
+        const opposingTeam = team === 'team1' ? 'team2' : 'team1';
+        
+        // تطبيق تأثير الحفرة إذا تم استخدامها
+        if (gameData.currentGame.usedHelps[team].includes('hole')) {
+            gameData.currentGame[opposingTeam].score -= points;
+            points *= 2;
+            showHoleAnimation(team, points);
+        }
+    }
+    
+    if (team === 'team1') {
+        gameData.currentGame.team1.score += points;
+    } else if (team === 'team2') {
+        gameData.currentGame.team2.score += points;
+    }
+    
+    updateScores();
+    
+    // تحديث الحالة
+    if (team === 'team1') {
+        updateGameStatus(`✅ ${gameData.currentGame.team1.name} أجاب بشكل صحيح!`);
+    } else if (team === 'team2') {
+        updateGameStatus(`✅ ${gameData.currentGame.team2.name} أجاب بشكل صحيح!`);
+    }
+    
+    // الانتقال للاعب التالي
+    gameData.currentGame.currentPlayer++;
+    const totalPlayers = gameData.currentGame.team1.players + gameData.currentGame.team2.players;
+    if (gameData.currentGame.currentPlayer > totalPlayers) {
+        gameData.currentGame.currentPlayer = 1;
+    }
+    
+    updateCurrentPlayerDisplay();
+    checkGameEnd();
+    
+    hideQuestionDisplay();
+    localStorage.setItem('currentQuizGame', JSON.stringify(gameData.currentGame));
+}
+
+// إزالة التحقق من انتهاء الوقت من أي مكان آخر في الكود
+function pauseTimer() {
+    clearInterval(gameData.timerInterval);
+    gameData.timerInterval = null;
+}
+
+function resetTimer() {
+    pauseTimer();
     gameData.timeLeft = 30;
-    document.getElementById('timerDisplay').textContent = gameData.timeLeft;
-    document.getElementById('timerControlBtn').innerHTML = '<i class="fas fa-pause"></i>';
+    const timerDisplay = document.getElementById('timerDisplay');
+    if (timerDisplay) {
+        timerDisplay.textContent = gameData.timeLeft;
+        timerDisplay.style.color = '';
+        timerDisplay.style.animation = '';
+    }
+    const timerControlBtn = document.getElementById('timerControlBtn');
+    if (timerControlBtn) {
+        timerControlBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    }
 }
 
 function toggleTimer() {
@@ -556,6 +644,9 @@ function useHelp(helpType, team) {
     }
     
     gameData.currentGame.usedHelps[team].push(helpType);
+    
+    // تحديث واجهة المساعدات
+    updateHelpButton(helpType, team);
     
     const helpModal = document.getElementById('helpModal');
     const helpModalTitle = document.getElementById('helpModalTitle');
@@ -583,11 +674,45 @@ function useHelp(helpType, team) {
                 </div>
             `;
             break;
+            
+        case 'callFriend':
+            helpModalTitle.textContent = 'اتصال بصديق';
+            helpModalContent.innerHTML = `
+                <p>يمكنك الاتصال بصديق للحصول على المساعدة.</p>
+                <div class="friend-call-animation">
+                    <i class="fas fa-phone-volume"></i>
+                    <p>جارٍ الاتصال...</p>
+                </div>
+            `;
+            break;
     }
     
     helpModal.style.display = 'block';
-    document.querySelectorAll(`.${team}-panel .help-option-btn[data-help="${helpType}"]`).forEach(btn => {
-        btn.disabled = true;
+}
+
+function updateHelpButton(helpType, team) {
+    const helpBtn = document.querySelector(`.${team}-panel .help-option-btn[data-help="${helpType}"]`);
+    if (helpBtn) {
+        helpBtn.style.opacity = '0.5';
+        helpBtn.disabled = true;
+        helpBtn.title = 'تم الاستخدام';
+    }
+}
+
+function updateHelpButtons() {
+    document.querySelectorAll('.help-option-btn').forEach(btn => {
+        const helpType = btn.dataset.help;
+        const team = btn.closest('.team1-panel') ? 'team1' : 'team2';
+        
+        if (gameData.currentGame.usedHelps[team].includes(helpType)) {
+            btn.style.opacity = '0.5';
+            btn.disabled = true;
+            btn.title = 'تم الاستخدام';
+        } else {
+            btn.style.opacity = '1';
+            btn.disabled = false;
+            btn.title = '';
+        }
     });
 }
 
@@ -605,9 +730,11 @@ function answerQuestion(team) {
     if (team !== 'none') {
         const opposingTeam = team === 'team1' ? 'team2' : 'team1';
         
+        // تطبيق تأثير الحفرة إذا تم استخدامها
         if (gameData.currentGame.usedHelps[team].includes('hole')) {
             gameData.currentGame[opposingTeam].score -= points;
             points *= 2;
+            showHoleAnimation(team, points);
         }
     }
     
@@ -619,9 +746,14 @@ function answerQuestion(team) {
     
     updateScores();
     
-    // إضافة السؤال إلى قائمة الأسئلة المجابة
-    const questionKey = `${gameData.currentQuestion.categoryId}-${gameData.currentQuestion.points}`;
-    answeredQuestions.push(questionKey);
+    // تحديث الحالة
+    if (team === 'team1') {
+        updateGameStatus(`✅ ${gameData.currentGame.team1.name} أجاب بشكل صحيح!`);
+    } else if (team === 'team2') {
+        updateGameStatus(`✅ ${gameData.currentGame.team2.name} أجاب بشكل صحيح!`);
+    } else {
+        updateGameStatus('⏰ انتهى الوقت - لم يجب أحد');
+    }
     
     // الانتقال للاعب التالي
     gameData.currentGame.currentPlayer++;
@@ -633,18 +765,34 @@ function answerQuestion(team) {
     updateCurrentPlayerDisplay();
     checkGameEnd();
     
-    document.getElementById('questionDisplay').style.display = 'none';
-    document.querySelector('.categories-board').style.display = 'grid';
-    gameData.gameState = 'board';
-    
+    hideQuestionDisplay();
     localStorage.setItem('currentQuizGame', JSON.stringify(gameData.currentGame));
+}
+
+function showHoleAnimation(team, points) {
+    const holeEffect = document.createElement('div');
+    holeEffect.className = 'hole-animation-effect';
+    holeEffect.innerHTML = `
+        <div class="hole-content">
+            <i class="fas fa-digging"></i>
+            <p>تم خصم ${points / 2} نقطة من الفريق المنافس!</p>
+        </div>
+    `;
+    
+    document.body.appendChild(holeEffect);
+    
+    setTimeout(() => {
+        holeEffect.remove();
+    }, 3000);
 }
 
 // التحقق من نهاية اللعبة
 function checkGameEnd() {
     const totalQuestions = gameData.currentGame.selectedCategories.length * 3; // 3 أسئلة لكل فئة
     if (answeredQuestions.length >= totalQuestions) {
-        showWinner();
+        setTimeout(() => {
+            showWinner();
+        }, 1000);
     }
 }
 
@@ -671,15 +819,13 @@ function showWinner() {
     winnerModal.style.display = 'block';
     gameData.gameState = 'winner';
     
-    // حفظ اللعبة في السجل بعد عرض الفائز
+    // حفظ اللعبة في السجل
     saveGameToHistory(gameData.currentGame);
 }
 
 function saveGameToHistory(game) {
-    // جلب السجل الحالي من localStorage أو إنشاء جديد
     let gamesHistory = JSON.parse(localStorage.getItem('quizGamesHistory')) || [];
     
-    // إضافة اللعبة الحالية إلى السجل
     gamesHistory.unshift({
         id: gamesHistory.length + 1,
         name: game.name,
@@ -687,51 +833,64 @@ function saveGameToHistory(game) {
         team1: {
             name: game.team1.name,
             score: game.team1.score,
-            players: Array(game.team1.players).fill('لاعب') // يمكن استبدالها بأسماء حقيقية
+            players: Array(game.team1.players).fill('لاعب')
         },
         team2: {
             name: game.team2.name,
             score: game.team2.score,
-            players: Array(game.team2.players).fill('لاعب') // يمكن استبدالها بأسماء حقيقية
+            players: Array(game.team2.players).fill('لاعب')
         },
         categories: game.selectedCategories.map(id => {
             const category = gameData.categories.find(c => c.id === id);
             return category ? category.name : 'غير معروف';
         }),
-        duration: '30 دقيقة', // يمكن حساب المدة الفعلية
+        duration: 'لم يتم تتبع الوقت',
         winner: game.winner || 'none'
     });
     
-    // حفظ السجل المحدث في localStorage
     localStorage.setItem('quizGamesHistory', JSON.stringify(gamesHistory));
 }
 
-
 // إعادة تعيين اللعبة
 function resetGame() {
-    answeredQuestions = [];
-    gameData.currentGame.team1.score = 0;
-    gameData.currentGame.team2.score = 0;
-    gameData.currentGame.currentPlayer = 1;
-    gameData.currentGame.usedHelps = { team1: [], team2: [] };
-    
-    updateScores();
-    updateCurrentPlayerDisplay();
-    renderGameBoard();
-    
-    document.querySelectorAll('.help-option-btn').forEach(btn => {
-        btn.disabled = false;
-    });
-    
-    document.getElementById('winnerModal').style.display = 'none';
-    gameData.gameState = 'board';
-    
-    localStorage.setItem('currentQuizGame', JSON.stringify(gameData.currentGame));
+    if (confirm('هل تريد إعادة تعيين اللعبة بالكامل؟')) {
+        answeredQuestions = [];
+        gameData.currentGame.team1.score = 0;
+        gameData.currentGame.team2.score = 0;
+        gameData.currentGame.currentPlayer = 1;
+        gameData.currentGame.usedHelps = { team1: [], team2: [] };
+        
+        updateScores();
+        updateCurrentPlayerDisplay();
+        renderGameBoard();
+        updateHelpButtons();
+        
+        document.getElementById('winnerModal').style.display = 'none';
+        gameData.gameState = 'board';
+        
+        localStorage.setItem('currentQuizGame', JSON.stringify(gameData.currentGame));
+        updateGameStatus('🔄 تم إعادة تعيين اللعبة - ابدأ من جديد');
+    }
+}
+
+// دالة لتحديث رسالة حالة اللعبة
+function updateGameStatus(message) {
+    const statusElement = document.getElementById('gameStatusMessage');
+    if (statusElement) {
+        statusElement.textContent = message;
+        
+        // إضافة تأثير ظهور
+        statusElement.style.opacity = '0';
+        setTimeout(() => {
+            statusElement.style.transition = 'opacity 0.3s';
+            statusElement.style.opacity = '1';
+        }, 10);
+    }
 }
 
 // وظائف مساعدة
 function getRandomAnswer() {
-    if (gameData.currentQuestion.image) {
+    if (gameData.currentQuestion && gameData.currentQuestion.image) {
         const imageAnswers = ["صورة مدينة", "مبنى شهير", "شخصية مشهورة", "اختراع حديث", "أثر تاريخي"];
         return imageAnswers[Math.floor(Math.random() * imageAnswers.length)];
     } else {
