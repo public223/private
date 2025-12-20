@@ -46,48 +46,70 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // عرض قائمة الألعاب
+// عرض قائمة الألعاب
 function renderGamesList() {
     const gamesGrid = document.querySelector('.games-grid');
     gamesGrid.innerHTML = '';
+    
+    // استخدام CSS Grid لضمان التنسيق المتجاوب
+    gamesGrid.style.display = 'grid';
+    gamesGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(clamp(300px, 30vw, 350px), 1fr))';
+    gamesGrid.style.gap = 'clamp(20px, 2vw, 30px)';
     
     myGamesData.games.forEach(game => {
         const gameCard = document.createElement('div');
         gameCard.className = 'game-card';
         gameCard.dataset.gameId = game.id;
         
+        // استخدام وحدات vw و clamp للقياسات
+        gameCard.style.width = '100%';
+        gameCard.style.minHeight = 'clamp(250px, 30vw, 300px)';
+        gameCard.style.padding = 'clamp(15px, 1.5vw, 20px)';
+        
         gameCard.innerHTML = `
             <div class="game-header">
-                <h3>${game.name}</h3>
-                <span class="game-date">${game.date}</span>
+                <h3 style="font-size: clamp(18px, 2vw, 24px); margin: 0 0 clamp(8px, 1vw, 12px) 0;">${game.name}</h3>
+                <span class="game-date" style="font-size: clamp(12px, 1.2vw, 14px);">${game.date}</span>
             </div>
-            <div class="game-teams">
-                <div class="team team1 ${game.winner === 'team1' ? 'winner' : ''}">
+            <div class="game-teams" style="margin: clamp(15px, 2vw, 20px) 0;">
+                <div class="team team1 ${game.winner === 'team1' ? 'winner' : ''}" 
+                     style="padding: clamp(8px, 1vw, 12px); font-size: clamp(14px, 1.5vw, 16px);">
                     <span class="team-name">${game.team1.name}</span>
                     <span class="team-score">${game.team1.score} نقطة</span>
                 </div>
-                <div class="vs-circle">VS</div>
-                <div class="team team2 ${game.winner === 'team2' ? 'winner' : ''}">
+                <div class="vs-circle" style="width: clamp(40px, 5vw, 50px); height: clamp(40px, 5vw, 50px); 
+                     font-size: clamp(14px, 1.5vw, 16px);">VS</div>
+                <div class="team team2 ${game.winner === 'team2' ? 'winner' : ''}" 
+                     style="padding: clamp(8px, 1vw, 12px); font-size: clamp(14px, 1.5vw, 16px);">
                     <span class="team-name">${game.team2.name}</span>
                     <span class="team-score">${game.team2.score} نقطة</span>
                 </div>
             </div>
             <div class="game-details">
-                <div class="detail">
+                <div class="detail" style="margin-bottom: clamp(8px, 1vw, 12px); font-size: clamp(13px, 1.3vw, 15px);">
                     <i class="fas fa-tags"></i>
                     <span>الفئات: ${game.categories.join('، ')}</span>
                 </div>
-                <div class="detail">
+                <div class="detail" style="margin-bottom: clamp(8px, 1vw, 12px); font-size: clamp(13px, 1.3vw, 15px);">
                     <i class="fas fa-users"></i>
                     <span>${game.team1.players.length} لاعبين ضد ${game.team2.players.length} لاعبين</span>
                 </div>
-                <div class="detail">
+                <div class="detail" style="margin-bottom: clamp(8px, 1vw, 12px); font-size: clamp(13px, 1.3vw, 15px);">
                     <i class="fas fa-clock"></i>
                     <span>مدة اللعبة: ${game.duration}</span>
                 </div>
             </div>
-            <div class="game-actions">
-                <button class="action-btn view-btn"><i class="fas fa-eye"></i> عرض التفاصيل</button>
-                <button class="action-btn share-btn"><i class="fas fa-share-alt"></i> مشاركة</button>
+            <div class="game-actions" style="margin-top: clamp(15px, 2vw, 20px);">
+                <button class="action-btn view-btn" 
+                        style="padding: clamp(8px, 1vw, 12px) clamp(12px, 1.5vw, 16px); 
+                               font-size: clamp(13px, 1.3vw, 15px);">
+                    <i class="fas fa-eye"></i> عرض التفاصيل
+                </button>
+                <button class="action-btn share-btn" 
+                        style="padding: clamp(8px, 1vw, 12px) clamp(12px, 1.5vw, 16px); 
+                               font-size: clamp(13px, 1.3vw, 15px);">
+                    <i class="fas fa-share-alt"></i> مشاركة
+                </button>
             </div>
         `;
         
