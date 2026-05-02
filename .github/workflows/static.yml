@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>✨ Aura AI ✨</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&family=Playfair+Display:ital@1&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --pink-light: #fce4ec;
+      --pink-soft: #f8bbd0;
+      --pink-main: #f48fb1;
+      --pink-deep: #e91e8c;
+      --purple-light: #f3e5f5;
+      --purple-soft: #e1bee7;
+      --purple-main: #ce93d8;
+      --purple-deep: #9c27b0;
+      --purple-dark: #6a1b9a;
+      --white: #fff9fc;
+      --text-dark: #3d1a47;
+      --text-mid: #7b3fa0;
+      --bubble-user: linear-gradient(135deg, #e91e8c, #9c27b0);
+      --bubble-ai: linear-gradient(135deg, #fce4ec, #f3e5f5);
+      --shadow: 0 8px 32px rgba(156, 39, 176, 0.15);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 40%, #e1bee7 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Decorative blobs */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, #f48fb1, #ce93d8);
+      top: -150px; left: -150px;
+      animation: floatBlob 8s ease-in-out infinite alternate;
+    }
+    body::after {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, #9c27b0, #e91e8c);
+      bottom: -120px; right: -100px;
+      animation: floatBlob 10s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes floatBlob {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(30px, 20px) scale(1.05); }
+    }
+
+    /* Floating sparkles */
+    .sparkles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    .sparkle {
+      position: absolute;
+      font-size: 18px;
+      opacity: 0;
+      animation: sparkleFloat linear infinite;
+    }
+    @keyframes sparkleFloat {
+      0%   { opacity: 0; transform: translateY(0) rotate(0deg); }
+      20%  { opacity: 0.8; }
+      80%  { opacity: 0.6; }
+      100% { opacity: 0; transform: translateY(-120px) rotate(360deg); }
+    }
+
+    /* Main container */
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      animation: fadeDown 0.7s ease both;
+    }
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .header .logo {
+      font-size: 2.8rem;
+      background: linear-gradient(135deg, #e91e8c, #9c27b0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      letter-spacing: 2px;
+    }
+    .header .tagline {
+      color: var(--text-mid);
+      font-size: 0.9rem;
+      font-weight: 300;
+      margin-top: 4px;
+      letter-spacing: 1px;
+    }
+    .header .stars { font-size: 1.2rem; }
+
+    /* Chat card */
+    .chat-card {
+      background: rgba(255, 249, 252, 0.85);
+      backdrop-filter: blur(20px);
+      border-radius: 28px;
+      border: 1.5px solid rgba(244, 143, 177, 0.35);
+      box-shadow: var(--shadow), 0 2px 8px rgba(233, 30, 140, 0.08);
+      display: flex;
+      flex-direction: column;
+      height: 520px;
+      overflow: hidden;
+      animation: fadeUp 0.7s ease 0.1s both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Chat header strip */
+    .chat-header {
+      background: linear-gradient(90deg, #f48fb1, #ce93d8);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .avatar-ring {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #fff, #f3e5f5);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      box-shadow: 0 2px 8px rgba(156,39,176,0.25);
+      flex-shrink: 0;
+    }
+    .chat-header-text { flex: 1; }
+    .chat-header-text .name {
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .chat-header-text .status {
+      color: rgba(255,255,255,0.85);
+      font-size: 0.75rem;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .dot-online {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #a5d6a7;
+      box-shadow: 0 0 6px #a5d6a7;
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Messages area */
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      scroll-behavior: smooth;
+    }
+    .messages::-webkit-scrollbar { width: 5px; }
+    .messages::-webkit-scrollbar-track { background: transparent; }
+    .messages::-webkit-scrollbar-thumb {
+      background: var(--pink-soft);
+      border-radius: 10px;
+    }
+
+    /* Message bubbles */
+    .msg {
+      display: flex;
+      gap: 10px;
+      animation: msgIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    @keyframes msgIn {
+      from { opacity: 0; transform: scale(0.88) translateY(8px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .msg.user { flex-direction: row-reverse; }
+
+    .msg-avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .msg.ai .msg-avatar {
+      background: linear-gradient(135deg, #f48fb1, #ce93d8);
+    }
+    .msg.user .msg-avatar {
+      background: linear-gradient(135deg, #9c27b0, #e91e8c);
+    }
+
+    .bubble {
+      max-width: 75%;
+      padding: 12px 16px;
+      border-radius: 20px;
+      font-size: 0.92rem;
+      line-height: 1.65;
+      word-break: break-word;
+    }
+    .msg.ai .bubble {
+      background: var(--bubble-ai);
+      border: 1px solid rgba(244,143,177,0.3);
+      color: var(--text-dark);
+      border-bottom-right-radius: 6px;
+    }
+    .msg.user .bubble {
+      background: var(--bubble-user);
+      color: #fff;
+      border-bottom-left-radius: 6px;
+      text-align: right;
+    }
+
+    /* Typing indicator */
+    .typing-bubble {
+      display: none;
+      align-items: center;
+      gap: 5px;
+      padding: 12px 18px;
+      background: var(--bubble-ai);
+      border: 1px solid rgba(244,143,177,0.3);
+      border-radius: 20px;
+      border-bottom-right-radius: 6px;
+      width: fit-content;
+    }
+    .typing-bubble.show { display: flex; }
+    .typing-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--purple-main);
+      animation: bounce 1.2s ease-in-out infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; background: var(--pink-main); }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; background: var(--purple-deep); }
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-6px); }
+    }
+
+    /* API key area */
+    .api-section {
+      padding: 12px 18px;
+      background: linear-gradient(90deg, rgba(243,229,245,0.6), rgba(252,228,236,0.6));
+      border-top: 1px solid rgba(206,147,216,0.2);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .api-section label {
+      font-size: 0.78rem;
+      color: var(--text-mid);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .api-input {
+      flex: 1;
+      min-width: 0;
+      border: 1.5px solid var(--purple-soft);
+      border-radius: 12px;
+      padding: 7px 12px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 0.8rem;
+      color: var(--text-dark);
+      background: rgba(255,255,255,0.8);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .api-input:focus { border-color: var(--purple-main); }
+    .api-save-btn {
+      padding: 7px 14px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ce93d8, #9c27b0);
+      color: #fff;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .api-save-btn:hover { opacity: 0.9; transform: scale(0.97); }
+
+    /* Input row */
+    .input-row {
+      padding: 14px 18px;
+      border-top: 1.5px solid rgba(244,143,177,0.2);
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      background: rgba(255,249,252,0.6);
+    }
+    .input-box {
+      flex: 1;
+      border: 1.5px solid var(--pink-soft);
+      border-radius: 18px;
+      padding: 11px 16px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 0.92rem;
+      color: var(--text-dark);
+      background: rgba(255,255,255,0.9);
+      resize: none;
+      outline: none;
+      line-height: 1.5;
+      max-height: 100px;
+      transition: border-color 0.25s, box-shadow 0.25s;
+      direction: rtl;
+    }
+    .input-box:focus {
+      border-color: var(--purple-main);
+      box-shadow: 0 0 0 3px rgba(206,147,216,0.18);
+    }
+    .input-box::placeholder { color: #d4a5c9; }
+
+    .send-btn {
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, #e91e8c, #9c27b0);
+      color: #fff;
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 14px rgba(233,30,140,0.35);
+    }
+    .send-btn:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(233,30,140,0.45); }
+    .send-btn:active { transform: scale(0.95); }
+    .send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 30px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: linear-gradient(135deg, #e91e8c, #9c27b0);
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      box-shadow: 0 4px 20px rgba(233,30,140,0.3);
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+      opacity: 0;
+      z-index: 99;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <!-- Sparkles -->
+  <div class="sparkles" id="sparkles"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="stars">✨ 🌸 ✨</div>
+      <div class="logo">Aura AI</div>
+      <div class="tagline">مساعدتك الذكية الجميلة 💜</div>
+    </div>
+
+    <!-- Chat Card -->
+    <div class="chat-card">
+      <!-- Strip -->
+      <div class="chat-header">
+        <div class="avatar-ring">🌸</div>
+        <div class="chat-header-text">
+          <div class="name">Aura</div>
+          <div class="status"><span class="dot-online"></span> متصلة الآن</div>
+        </div>
+        <span style="color:rgba(255,255,255,0.8); font-size:1.3rem;">💅</span>
+      </div>
+
+      <!-- Messages -->
+      <div class="messages" id="messages">
+        <div class="msg ai">
+          <div class="msg-avatar">🌸</div>
+          <div class="bubble">
+            هاي حبيبتي! أنا أورا 💜 مساعدتك الذكية~<br>
+            كيف أقدر أساعدك اليوم؟ 🌸✨
+          </div>
+        </div>
+      </div>
+
+      <!-- Typing row -->
+      <div style="padding: 0 18px 6px; display:flex; gap:10px; align-items:center;">
+        <div class="msg-avatar" style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#f48fb1,#ce93d8);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">🌸</div>
+        <div class="typing-bubble" id="typingBubble">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
+
+      <!-- Input -->
+      <div class="input-row">
+        <textarea class="input-box" id="userInput" placeholder="اكتبي رسالتك هنا... 🌸" rows="1"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="إرسال">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // --- Sparkles ---
+    const sparkleEmojis = ['✨','💜','🌸','💗','🦋','🌷','⭐','💫','🎀'];
+    const sparklesEl = document.getElementById('sparkles');
+    for (let i = 0; i < 18; i++) {
+      const s = document.createElement('span');
+      s.className = 'sparkle';
+      s.textContent = sparkleEmojis[Math.floor(Math.random() * sparkleEmojis.length)];
+      s.style.left = Math.random() * 100 + 'vw';
+      s.style.top = Math.random() * 100 + 'vh';
+      s.style.animationDuration = (5 + Math.random() * 8) + 's';
+      s.style.animationDelay = (Math.random() * 6) + 's';
+      s.style.fontSize = (12 + Math.random() * 14) + 'px';
+      sparklesEl.appendChild(s);
+    }
+
+    // --- Config ---
+    const API_KEY = 'AIzaSyDoHNpko5S14P7EVW1pll2KkjG8CD22I4U';
+    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+    const SYSTEM_PROMPT = 'أنتِ أورا، مساعدة ذكية أنيقة وودودة. تتكلمين بأسلوب ناعم ومحبب وتستخدمين إيموجي بشكل معتدل. تردين باللغة التي يكتب بها المستخدم.';
+
+    // --- Auto resize textarea ---
+    const textarea = document.getElementById('userInput');
+    textarea.addEventListener('input', () => {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 100) + 'px';
+    });
+    textarea.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
+
+    // --- Send ---
+    const messagesEl = document.getElementById('messages');
+    const typingBubble = document.getElementById('typingBubble');
+    const sendBtn = document.getElementById('sendBtn');
+    let history = [];
+
+    async function sendMessage() {
+      const text = textarea.value.trim();
+      if (!text) return;
+
+      addBubble('user', text);
+      history.push({ role: 'user', parts: [{ text }] });
+      textarea.value = '';
+      textarea.style.height = 'auto';
+      sendBtn.disabled = true;
+      typingBubble.classList.add('show');
+      scrollDown();
+
+      try {
+        const res = await fetch(GEMINI_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+            contents: history
+          })
+        });
+        const data = await res.json();
+        typingBubble.classList.remove('show');
+
+        if (data.error) {
+          showToast('خطأ: ' + data.error.message);
+          history.pop();
+        } else {
+          const reply = data.candidates[0].content.parts[0].text;
+          addBubble('ai', reply);
+          history.push({ role: 'model', parts: [{ text: reply }] });
+        }
+      } catch (err) {
+        typingBubble.classList.remove('show');
+        showToast('في مشكلة بالاتصال 😔');
+        history.pop();
+      }
+
+      sendBtn.disabled = false;
+      scrollDown();
+    }
+
+    function addBubble(role, text) {
+      const msg = document.createElement('div');
+      msg.className = 'msg ' + (role === 'user' ? 'user' : 'ai');
+      const avatar = document.createElement('div');
+      avatar.className = 'msg-avatar';
+      avatar.textContent = role === 'ai' ? '🌸' : '👸';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = text;
+      msg.appendChild(avatar);
+      msg.appendChild(bubble);
+      messagesEl.appendChild(msg);
+    }
+
+    function scrollDown() {
+      setTimeout(() => messagesEl.scrollTop = messagesEl.scrollHeight, 60);
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2800);
+    }
+  </script>
+</body>
+</html>
